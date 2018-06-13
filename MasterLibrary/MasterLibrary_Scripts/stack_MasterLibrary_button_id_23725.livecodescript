@@ -7,6 +7,7 @@ Script "stack_MasterLibrary_button_id_23725"
 
 
 on seSetObjectState objRef, objState
+   if objRef is empty then pass seSetObjectState
    put the long id of objRef into t1
    put the long id of btn "Lib" of cd "LibMgr" of stack "MasterLibrary" into t2
    if t1 = t2 and objState = "applied" then

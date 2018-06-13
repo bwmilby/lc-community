@@ -132,10 +132,10 @@ on test__switch
    test _Switch("Ken","Ken=male","Richard=male","Carol=female") , "male" 
 end test__switch
 
-on test_last
-   test last ("this,is,a,test",comma) , "test" 
-   test last ("/user/test/file.txt") , "file.txt" 
-end test_last
+on test_lastItem
+   test lastItem ("this,is,a,test",comma) , "test" 
+   test lastItem ("/user/test/file.txt") , "file.txt" 
+end test_lastItem
 
 on test_isWinNT
  -- test on platform

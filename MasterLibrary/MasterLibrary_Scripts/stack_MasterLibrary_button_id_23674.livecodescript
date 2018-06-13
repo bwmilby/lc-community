@@ -3388,27 +3388,27 @@ function FileInfo pFilePath,pOpt_InfoItem
    end if
 end FileInfo
 
-function last p,d
-   /* last Misc
+function lastItem p,d
+   /* lastItem Misc
    Syntax:
-   last (string,[delimeter])
+   lastItem (string,[delimeter])
    Examples:
-   get last (string)
-   get last (string,tab)
+   get lastItem (string)
+   get lastItem (string,tab)
    Description:
    Returns the last item of a string, when the delimiter may be optionally set
    defaults is "/"
    
    Source:   
    Michael Doub
-   last */
+   lastItem */
    if d is not empty then
       set the itemDel to d
    else
       set the itemDel to "/"
    end if
    return last item of p
-end last
+end lastItem
 
 
 function AppPath pAppStack
@@ -8747,7 +8747,8 @@ function ConvertXMLToArray pXML, pStoreEncodedAs, pUseValueKey, pForceNumberInde
    
    if theTreeID is an integer then
       ## Determine the encoding of the XML, default to UTF-8
-      put matchText(pXML, "<\?xml (.*)encoding=" & quote & "(.*)" & quote & "\?>", versionMatch, theXMLEncoding) into theResult
+      put matchText(pXML, "<\?xml (.*)encoding=" & quote & "(.*)" & quote & "\?>", versionMatch, theXMLEncoding) into theResult -- returns encoding="ISO-8859-1" standalone="no" (original from Trevor)
+      --put matchText(pXML, "<?xml (.)encoding=" & quote & "([^" & quote & "])", versionMatch, theXMLEncoding) into theResult -- returns encoding="ISO-8859-1"
       if theXMLEncoding is empty then put "utf-8" into theXMLEncoding
       
       ## Now convert to array. 
