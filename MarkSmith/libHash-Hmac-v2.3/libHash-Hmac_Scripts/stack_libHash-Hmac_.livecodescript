@@ -76,10 +76,10 @@ end fileMd5.b64
 ------------------------------------------------
 --> sha1
 
-function sha1digest pInput, pIsFile
+function ms_sha1digest pInput, pIsFile
    put sha1(pInput, pIsFile) into tDigest
    return tDigest
-end sha1digest
+end ms_sha1digest
 
 function sha1.bin pInput, pIsFile
    put sha1(pInput, pIsFile) into tDigest

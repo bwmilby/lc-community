@@ -1491,7 +1491,7 @@ end processChunk
 --end rotateLeft
 
 
-private function sha1Digest pString
+private function ms_sha1Digest pString
    initSha1Locals
     
    put preProcess(pString) into tMsg
@@ -1506,7 +1506,7 @@ private function sha1Digest pString
     
    initSha1Locals
    return tDigest
-end sha1Digest
+end ms_sha1Digest
 
 --|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--
 --> sha1Interface
