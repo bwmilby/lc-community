@@ -1,0 +1,66 @@
+in the sdb library, most of the functions can take a format parameter. Generally, if this is set to "xml" then then the raw xml response from sdb is returned.
+If it is set to "array" then an array is returned which will contain both the data requested and information about the request itself, including the 'box usage' which may be used to monitor or log your use of sdb.
+
+the xml response from a "listDomains" request:
+
+request: put sdb.listDomains("xml")
+
+returned:
+<?xml version="1.0"?><ListDomainsResponse xmlns="http://sdb.amazonaws.com/doc/2007-11-07/"><ListDomainsResult><DomainName>myDomain1</DomainName><DomainName>myDomain2</DomainName><DomainName>myDomain3</DomainName></ListDomainsResult><ResponseMetadata><RequestId>781de38f-6ac1-bd13-1689-6ff207f106e1</RequestId><BoxUsage>0.0000071759</BoxUsage></ResponseMetadata></ListDomainsResponse>
+
+or
+
+request: put sdb.listDomains("array") into tArray
+
+returned:
+
+tArray["domainlist"] =  myDomain1  myDomain2  myDomain3tArray["responseMetadata"] :   boxusage = 0.0000071759   requestid = d79ca8aa-be17-86d6-1477-03594ed48f84tArray["status"] = ok
+
+elements of the returned array:
+"domainList" which contains a list of your domains
+"status" which is either "ok" for a successful request, or "error"
+"responeMetadata" which is an array with the elements:
+"boxusage" - the chargeable resource usage for this request
+"requestid" - the unique id for this request
+
+if there was an error, then there will be an "error" element with a description of the error.
+
+These may be useful for logging and troubleshooting.
+
+if no format parameter is passed then the requested data is returned with no other information,
+
+request: put sdb.listDomains()
+
+returned:
+
+myDomain1myDomain2myDomain3
+
+-----
+function sdb.createDomain pDomainName, pFormat
+
+pDomainName: the name you choose for your domain.
+pFormat: if "xml" then the raw xml response is returned, otherwise returns empty on success
+
+If there was an error, then a short description of the error is returned eg. "error: invalid domain name"
+
+-----
+
+function sdb.deleteDomain pomainName, pFormat
+
+pDomainName: the name of the domain you want to delete.
+pFormat: if "xml" then the raw xml response is returned, otherwise returns empty on success
+
+If there was an error, then a short description of the error is returned eg. "error: invalid domain does not exist"
+
+-----
+
+function sdb.listDomains pFormat
+
+pFormat: if "xml" then the raw xml response is returned. Otherwise, a list of your domains is returned.
+
+-----
+
+function sdb.domainMetadata pDomain
+
+
+-----

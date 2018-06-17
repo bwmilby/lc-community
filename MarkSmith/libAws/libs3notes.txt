@@ -1,0 +1,78 @@
+s3.setSecure
+command
+
+s3.setSecure true|false
+
+If set to true, https connections will be used, otherewise http.
+It's set to true by default
+see curl.setStrictSsl
+----------
+s3.store
+command
+blocking
+
+s3.store objectKey, dataToStore, accessControl
+
+stores the given data to the object named.
+
+objectKey is the full name (including bucket) of the object you want to store the data in eg "someBucket/someObject"
+
+The data can be any kind of text or binary data.
+
+accessControl can be one of "private", "public-read", "public-read-write", "authenticated-read". If not specified, "private" is the default.
+
+If you want to upload a file directly from disc, then use the full path of the file you want to upload, and prefix it with "file:"
+
+put "/Users/me/Desktop/someFile.txt" into tFile
+s3.store "/someBucket/someFile.txt", "file:" & tFile
+
+If an error occurs, there will be a description in 'the result', which will otherwise be empty.
+----------
+s3.fetch
+function
+blocking
+
+put s3.fetch(objectKey) into variable
+get s3.fetch(objectKey, destinationFile)
+
+objectName is the full name (including bucket) of the object you want to fetch eg. "someBucket/someObject"
+
+destinationFile (if used) is the full path to the file you want to put the downloaded data in.
+
+If no destination file is provided, the function simply returns the data, otherwise, it writes the data to the provided file.
+
+In either case, if there was an error, the description of the error is returned.
+----------
+s3.info
+function
+blocking
+
+put s3.info() -- shows a list of your buckets
+put s3.info(bucketName) -- shows a list of the objects in a bucket
+put s3.info(objectKey) -- shows a list of properties of the object
+
+The properties listed for an object include:
+
+an md5 digest of the object
+the last modified date of the object in seconds (unix time)
+any meta-data that was attached to the object when uploaded.
+----------
+s3.delete
+command
+blocking
+
+s3.delete objectKey
+s3.delete bucketName
+
+Deletes the specified object. If a bucket is specified, it will be deleted only if it is empty.
+
+The result will be set to empty on success, otherwise it will contain an error description.
+----------
+s3.uploadFile.curl
+function
+
+put s3.uploadFile.curl(tObject, tFile) into tCurl.
+this creates a curl instance that is initialised and ready to upload the given file to the given bucket/object. The id of that curl instance is returned.
+----------
+
+
