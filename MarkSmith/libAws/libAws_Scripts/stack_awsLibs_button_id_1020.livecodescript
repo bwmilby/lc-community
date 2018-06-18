@@ -29,13 +29,13 @@ local sSkey
 
 
 on s3.cancel
-    put true into sCancel
+   put true into sCancel
 end s3.cancel
 
 -----
 
 on s3.setSecure pBool
-    put (pBool is true) into sUseHttps
+   put (pBool is true) into sUseHttps
 end s3.setSecure
 
 -----
@@ -46,138 +46,140 @@ end s3.setSecure
 ---------------------------
 
 function s3.store pS3path, pData, pCannedAcl, pMetaTags
-    if char 1 to 5 of pData is "file:" then
-        put s3.putFile.curl(pS3path, char 6 to -1 of pData, pCannedAcl, pMetaTags) into tCurl
-    else
-        put s3.putData.curl(pS3path, pData, pCannedAcl, pMetaTags) into tCurl
-    end if
-     
-    try
-        put curl.runTilDone(tCurl) into tRes
-        put s3.response(tRes) into tResponse
-        if tResponse["status"] is "error" then
-            return tResponse["curlerror"] & cr & tResponse["Code"]
-        else
-            return empty
-        end if
-         
-    catch tError
-        return "libRevS3 error: couldn't store" && pS3path
-    end try
+   if char 1 to 5 of pData is "file:" then
+      put s3.putFile.curl(pS3path, char 6 to -1 of pData, pCannedAcl, \
+            pMetaTags) into tCurl
+   else
+      put s3.putData.curl(pS3path, pData, pCannedAcl, pMetaTags) into tCurl
+   end if
+   
+   try
+      put curl.runTilDone(tCurl) into tRes
+      put s3.response(tRes) into tResponse
+      if tResponse["status"] is "error" then
+         return tResponse["curlerror"] & cr & tResponse["Code"]
+      else
+         return empty
+      end if
+      
+   catch tError
+      return "libRevS3 error: couldn't store" && pS3path
+   end try
 end s3.store
 
 -----
 
 function s3.fetch pS3path, pDestFile
-    if pDestFile is not empty then
-        put s3.getFile.curl(pS3path, pDestFile) into tCurl
-    else
-        put s3.getData.curl(pS3path) into tCurl
-    end if
-     
-    try
-        put curl.runTilDone(tCurl) into tRes
-        put s3.response(tRes) into tResponse
-        if tResponse["status"] is "error" then
-            return tResponse["curlerror"] & cr & tResponse["Code"]
-        else
-            if pDestFile is empty then
-                return tResponse
-            else
-                return empty
-            end if
-        end if
-    catch tError
-        return "libRevS3 error:' couldn't fetch" && pS3path
-    end try
+   if pDestFile is not empty then
+      put s3.getFile.curl(pS3path, pDestFile) into tCurl
+   else
+      put s3.getData.curl(pS3path) into tCurl
+   end if
+   
+   try
+      put curl.runTilDone(tCurl) into tRes
+      put s3.response(tRes) into tResponse
+      if tResponse["status"] is "error" then
+         return tResponse["curlerror"] & cr & tResponse["Code"]
+      else
+         if pDestFile is empty then
+            return tResponse
+         else
+            return empty
+         end if
+      end if
+   catch tError
+      return "libRevS3 error:' couldn't fetch" && pS3path
+   end try
 end s3.fetch
 
 -----
 
 function s3.info pS3path
-    if char 1 of pS3path is "/" then delete char 1 of pS3path
-     
-    try
-        if pS3path is empty then
-            put s3.listAllMyBuckets() into tResult
-        else
-            set the itemdelimiter to "/"
-            if item 2 of pS3path is empty then
-                put s3.listBucket(pS3path) into tResult
-            else
-                put s3.listObject(pS3path) into tResult
-                if tResult begins with "error:" then return tResult
-                combine tResult by cr and "="
-            end if
-        end if
-        return tResult
-    catch tError
-        return "libRevS3 error: couldn't get info for" && pS3path
-    end try
+   if char 1 of pS3path is "/" then delete char 1 of pS3path
+   
+   try
+      if pS3path is empty then
+         put s3.listAllMyBuckets() into tResult
+      else
+         set the itemdelimiter to "/"
+         if item 2 of pS3path is empty then
+            put s3.listBucket(pS3path) into tResult
+         else
+            put s3.listObject(pS3path) into tResult
+            if tResult begins with "error:" then return tResult
+            combine tResult by cr and "="
+         end if
+      end if
+      return tResult
+   catch tError
+      return "libRevS3 error: couldn't get info for" && pS3path
+   end try
 end s3.info
 
 
 -----
 
 function s3.delete pS3Path
-    if pS3path is empty then return "libRevS3 error: no object specified"
-     
-    try
-        put s3.deleteObject(pS3path) into tArray
-        if tArray is an array then
-            return tArray["curlerror"] & comma & tArray["Code"]
-        else
-            return empty
-        end if
-    catch tError
-        return "libRevS3 error: couldn't delete" && pS3path
-    end try
+   if pS3path is empty then return "libRevS3 error: no object specified"
+   
+   try
+      put s3.deleteObject(pS3path) into tArray
+      if tArray is an array then
+         return tArray["curlerror"] & comma & tArray["Code"]
+      else
+         return empty
+      end if
+   catch tError
+      return "libRevS3 error: couldn't delete" && pS3path
+   end try
 end s3.delete
 
 -----
 
 function s3.fs pS3path, pWhat, pFullPaths, pDetailed
-    if char 1 of pS3path is "/" then delete char -1 of pS3path
-    if pS3path is empty then return s3.listAllMyBuckets()
-     
-    set the itemdelimiter to "/"
-    put item 1 of pS3path into tBucket
-    if tBucket is empty then return empty
-    put item 2 to -1 of pS3path into tPrefix
-    if (tPrefix is not empty) and (char -1 of tPrefix is not "/") then put "/" after tPrefix
-    put s3.listBucket(tBucket, "array", tPrefix, "/") into tRes
-     
-    put tBucket into tRes["bucketname"]
-    switch pWhat
-        case "files"
-        case "f"
-            put fsfiles(tRes, pFullPaths, pDetailed) into tReturn
-            break
-        case "folders"
-        case "d"
-            put fsfolders(tRes, pFullPaths) into tReturn
-            break
-        case "fd"
-        default
-            put fsfiles(tRes, pFullPaths, pDetailed) into tReturn["files"]
-            put fsfolders(tRes, pFullPaths) into tReturn["folders"]
-            break
-    end switch
-    return tReturn
+   if char 1 of pS3path is "/" then delete char -1 of pS3path
+   if pS3path is empty then return s3.listAllMyBuckets()
+   
+   set the itemdelimiter to "/"
+   put item 1 of pS3path into tBucket
+   if tBucket is empty then return empty
+   put item 2 to -1 of pS3path into tPrefix
+   if (tPrefix is not empty) and (char -1 of tPrefix is not "/") then \
+         put "/" after tPrefix
+   put s3.listBucket(tBucket, "array", tPrefix, "/") into tRes
+   
+   put tBucket into tRes["bucketname"]
+   switch pWhat
+      case "files"
+      case "f"
+         put fsfiles(tRes, pFullPaths, pDetailed) into tReturn
+         break
+      case "folders"
+      case "d"
+         put fsfolders(tRes, pFullPaths) into tReturn
+         break
+      case "fd"
+      default
+         put fsfiles(tRes, pFullPaths, pDetailed) into tReturn["files"]
+         put fsfolders(tRes, pFullPaths) into tReturn["folders"]
+         break
+   end switch
+   return tReturn
 end s3.fs
 
 -----
 
 function s3.bucketWalk pFo
-    put s3.fs(pFo) into tArray
-    repeat for each line L in tArray["files"]
-        put pFo & "/" & L & cr after tList
-    end repeat
-    repeat for each line L in tArray["folders"]
-        put pFo & "/" & L into nFo
-        put s3.bucketWalk(nFo) & cr after tList
-    end repeat
-    return tList
+   put s3.fs(pFo) into tArray
+   repeat for each line L in tArray["files"]
+      put pFo & "/" & L & cr after tList
+   end repeat
+   repeat for each line L in tArray["folders"]
+      put pFo & "/" & L into nFo
+      put s3.bucketWalk(nFo) & cr after tList
+   end repeat
+   return tList
 end s3.bucketWalk
 
 
@@ -192,10 +194,10 @@ end s3a.request
 function s3a.request.curl tRequest
    switch tRequest["action"]
       case "copyObject"
-          
+         
          break
       case "listObject"
-          
+         
          break
    end switch
 end s3a.request.curl
@@ -219,7 +221,8 @@ function s3a.copyObject pArray
    end if
    
    get pArray["ifmodified"]
-   if it is not empty then put it into tQarray["x-amz-copy-source-if-modified-since"]
+   if it is not empty then \
+         put it into tQarray["x-amz-copy-source-if-modified-since"]
    
    get pArray["ifunmodified"]
    if it is not empty then
@@ -230,7 +233,7 @@ function s3a.copyObject pArray
    repeat for each key k in pArray
       if k begins with "x-amz-meta-" then put pArray[k] into tQarray[k]
    end repeat
-    
+   
    put s3.curl(tQarray) into tCurl
    return tCurl
 end s3a.copyObject
@@ -240,11 +243,11 @@ end s3a.copyObject
 -------------------------------
 
 function s3.putData.curl pS3path, pData, pCannedAcl, pMetaTags
-    
+   
    put md5.b64(pData) into tQarray["Content-MD5"]
    put getContentType(pObject)  into tQarray["Content-Type"]
    put length(pData) into tQarray["Content-Length"]
-    
+   
    put the tempname into tQarray["inputfile"]
    writeBinFile tQarray["inputfile"], pData
    put pS3path into tQarray["s3path"]
@@ -253,7 +256,7 @@ function s3.putData.curl pS3path, pData, pCannedAcl, pMetaTags
    put s3.cannedAcl(pCannedAcl) into tQarray["x-amz-acl"]
    
    makeMetaTags tQarray, pMetaTags
-    
+   
    put s3.curl(tQarray) into tCurl
    curl.setDeleteInputfile tCurl, true
    return tCurl
@@ -294,17 +297,17 @@ end s3.getData
 
 function s3.putFile.curl pS3path, pFile, pCannedAcl, pMetaTags
    put getBigFileInfo(pFile, true) into tInfo
-    
+   
    put tInfo["md5.b64"] into tQarray["Content-MD5"]
    put tInfo["ContentType"] into tQarray["Content-Type"]
    put tInfo["size"] into tQarray["Content-Length"]
    put tInfo["fullPathName"] into tQarray["inputFile"]
    makeMetaTags tQarray, pMetaTags
-    
+   
    put pS3path into tQarray["s3path"]
    put "PUT" into tQarray["httpMethod"]
    put s3.cannedAcl(pCannedAcl) into tQarray["x-amz-acl"]
-    
+   
    put s3.curl(tQarray) into tCurl
    return tCurl
 end s3.putFile.curl
@@ -326,26 +329,28 @@ function s3.putFileConfig pS3path, pFileInfo, pCannedAcl, pMetaTags
    put pFileInfo["size"] into tQarray["Content-Length"]
    put pFileInfo["fullPathName"] into tQarray["inputFile"]
    makeMetaTags tQarray, pMetaTags
-    
+   
    put pS3path into tQarray["s3path"]
    put "PUT" into tQarray["httpMethod"]
    put s3.cannedAcl(pCannedAcl) into tQarray["x-amz-acl"]
-    
+   
    put s3.curl(tQarray) into tCurl
    put curl.portableConfig(tCurl) into tConfig
    curl.cleanup tCurl
-    
-   repeat for each item i in "configfile,outputfile,process,deleteoutputfile,status"
+   
+   repeat for each item i in \
+         "configfile,outputfile,process,deleteoutputfile,status"
       delete variable tConfig[i]
    end repeat
-    
+   
    return tConfig
 end s3.putFileConfig
 
 -----
 
 function s3.postFile.curl pS3path, pFile, pExpiry, pAcl
-   if (pExpiry is not an integer) or (pExpiry < 1) then put the seconds + 30 into pExpiry
+   if (pExpiry is not an integer) or (pExpiry < 1) then \
+         put the seconds + 30 into pExpiry
    set the itemdelimiter to "/"
    put item 1 of pS3path into tBucket
    
@@ -399,7 +404,7 @@ end s3.getFile
 function s3.deleteObject.curl pS3path
    put pS3path into tQarray["s3path"]
    put "DELETE" into tQarray["httpMethod"]
-    
+   
    return s3.curl(tQarray)
 end s3.deleteObject.curl
 
@@ -446,7 +451,8 @@ end s3.listObject.curl
 
 -----
 
-function s3.copyObject.curl pSourceS3path, pDestS3path, pCannedAcl, pCopyMeta, pMetaTags
+function s3.copyObject.curl pSourceS3path, pDestS3path, pCannedAcl, \
+      pCopyMeta, pMetaTags
    put pDestS3path into tQarray["s3path"]
    
    if char 1 of pSourceS3path is not "/" then put "/" before pSourceS3path
@@ -473,8 +479,10 @@ end s3.copyObject.curl
 
 -----
 
-function s3.copyObject pSourceS3path, pDestS3path, pCannedAcl, pCopyMeta, pMetaTags
-   put s3.copyObject.curl(pSourceS3path, pDestS3Path, pCannedAcl, pCopyMeta, pMetaTags) into tCurl
+function s3.copyObject pSourceS3path, pDestS3path, pCannedAcl, \
+      pCopyMeta, pMetaTags
+   put s3.copyObject.curl(pSourceS3path, pDestS3Path, pCannedAcl, pCopyMeta, \
+         pMetaTags) into tCurl
    put curl.runTilDone(tCurl) into tResponse
    
    return s3.response(tResponse)
@@ -489,10 +497,11 @@ function s3.createBucket.curl pBucket, pCannedAcl, pLocation
    put s3.cannedAcl(pCannedAcl) into tQarray["x-amz-acl"]
    
    if pLocation is "EU" then
-      put "<CreateBucketConfiguration><LocationConstraint>EU</LocationConstraint></CreateBucketConfiguration>" into pLocXml
+      put "<CreateBucketConfiguration><LocationConstraint>EU" & \
+            "</LocationConstraint></CreateBucketConfiguration>" into pLocXml
       put length(pLocXml) into tQarray["Content-Length"]
    end if
-    
+   
    put s3.pathStyleCurl(tQarray) into tCurl
    if pLocation is "EU" then curl.setPutData tCurl, pLocXml
    
@@ -524,15 +533,17 @@ function s3.listBucket pBucket, pFormat, pPrefix, pDelimiter, pMarker, pMaxkeys
    put false into sCancel
    put "GET" into tQarray["httpMethod"]
    put pBucket into tQarray["bucket"]
-    
+   
    put true into theresMore
-   repeat while theresMore and not sCancel and (tResponseArray["request"]["status"] is not "error")
+   repeat while theresMore and not sCancel and \
+         (tResponseArray["request"]["status"] is not "error")
       add 1 to requestCount
-      put makeSubResource(pPrefix, pDelimiter, pMarker, pMaxKeys) into tQarray["subresource"]
+      put makeSubResource(pPrefix, pDelimiter, pMarker, pMaxKeys) \
+            into tQarray["subresource"]
       
       put s3.curl(tQarray) into tCurl
       put curl.runTilDone(tCurl) into tResponse
-       
+      
       if tResponse begins with "error:" then return s3.simpleError(tResponse)
       
       put s3xml.listBucket(tResponse) into tResponseArray
@@ -546,11 +557,12 @@ function s3.listBucket pBucket, pFormat, pPrefix, pDelimiter, pMarker, pMaxkeys
          repeat for each key k in tResponseArray["objects"]
             put tResponseArray["objects"][k] into tResArray["objects"][k]
          end repeat
-         if tResponseArray["prefixes"] is not empty then put tResponseArray["prefixes"] & cr after tResArray["prefixes"]
+         if tResponseArray["prefixes"] is not empty then \
+               put tResponseArray["prefixes"] & cr after tResArray["prefixes"]
       end if
-       
+      
    end repeat
-    
+   
    switch pFormat
       case "xml"
          return tXmlArray
@@ -573,8 +585,9 @@ end s3.listBucket
 function s3.listBucket.curl pBucket, pPrefix, pDelimiter, pMarker, pMaxkeys
    put "GET" into tQarray["httpMethod"]
    put pBucket into tQarray["bucket"]
-   put makeSubResource(pPrefix, pDelimiter, pMarker, pMaxkeys) into tQarray["subresource"]
-    
+   put makeSubResource(pPrefix, pDelimiter, pMarker, pMaxkeys) \
+         into tQarray["subresource"]
+   
    return s3.curl(tQarray)
 end s3.listBucket.curl
 
@@ -583,11 +596,11 @@ end s3.listBucket.curl
 function s3.listAllMyBuckets pFormat
    put "GET" into tQarray["httpMethod"]
    put s3.curl(tQarray) into tCurl
-    
+   
    --put curl.runTilDone(tCurl) into tResponse
    --if tResponse begins with "error:" then return s3.simpleError(tResponse)
    --put s3xml.listAllMyBuckets(tResponse) into tArray
-    
+   
    curl.execute tCurl
    wait until curl.done(tCurl) with messages
    put curl.response(tCurl) into tResponse
@@ -595,7 +608,7 @@ function s3.listAllMyBuckets pFormat
    curl.cleanup tCurl
    
    
-    
+   
    switch pFormat
       case "raw"
       case "xml"
@@ -638,7 +651,7 @@ end s3.getAcl.curl
 function s3.getAcl pS3path, pFormat
    put s3.getAcl.curl(pS3path) into tCurl
    put curl.runTilDone(tCurl) into tResponse
-    
+   
    if pFormat is "xml" then
       return linerize(tResponse)
    else
@@ -680,7 +693,7 @@ function s3.getLogging.curl pBucket
    put pBucket into tQarray["bucket"]
    put "GET" into tQarray["httpMethod"]
    put  "logging" into tQarray["subresource"]
-    
+   
    put s3.curl(tQarray) into tCurl
    return tCurl
 end s3.getLogging.curl
@@ -720,7 +733,7 @@ function s3.getLocation.curl pBucket
    put pBucket into tQarray["bucket"]
    put "GET" into tQarray["httpMethod"]
    put "location" into tQarray["subresource"]
-    
+   
    put s3.curl(tQarray) into tCurl
    return tCurl
 end s3.getLocation.curl
@@ -783,8 +796,9 @@ end s3.authenticatedUrl
 function s3.torrent pS3path, pDest
    if char -8 to -1 of pDest is not ".torrent" then put ".torrent" after pDest
    set the itemdelimiter to "/"
-   put "http://" & item 1 of pS3path & "." & kS3url & "/" & item 2 to -1 of pS3path & "?torrent" into tUrl
-  
+   put "http://" & item 1 of pS3path & "." & kS3url & "/" & \
+         item 2 to -1 of pS3path & "?torrent" into tUrl
+   
    put curl.new() into tCurl
    curl.setUrl tCurl, tUrl
    if pDest is not empty then curl.setOutputFile tCurl, pDest
@@ -818,7 +832,7 @@ function s3.getBucketInfo pBucket
          put curl.response(tLogCurl) into tArray["logging"]
          add 1 to numDone
       end if
-       
+      
       if curl.done(tLocCurl) then
          put curl.response(tLocCurl) into tArray["location"]
          add 1 to numDone
@@ -885,8 +899,8 @@ local sDeleteCurls
 
 -----
 
-# takes a newline delimited list of full s3 object keys (ie. including bucket name)
-# and deletes them as simultaneously as curl.maxCurls allows
+# takes a newline delimited list of full s3 object keys (ie. including bucket
+# name) and deletes them as simultaneously as curl.maxCurls allows
 
 on s3.multiDelete pObjectList
    put pObjectList into sDeleteObjects
@@ -911,7 +925,8 @@ on s3priv_doMultiDelete
          put s3.deleteObject.curl(L) into tCurl
          put L into sDeleteCurls[tCurl]
          curl.execute tCurl
-         if "s3priv_checkMultiDelete" is not in the pendingmessages then send "s3priv_checkMultiDelete" to me in 10 millisecs
+         if "s3priv_checkMultiDelete" is not in the pendingmessages then \
+               send "s3priv_checkMultiDelete" to me in 10 millisecs
          wait 10 millisecs with messages
       end if
    end repeat
@@ -926,13 +941,14 @@ on s3priv_checkMultiDelete
       repeat for each key tCurl in sDeleteCurls
          if curl.done(tCurl) then
             get curl.response(tCurl)
-            if "204 No Content" is not in it then put it into sDeleteErrors[sDeleteCurls[tCurl]]
+            if "204 No Content" is not in it then \
+                  put it into sDeleteErrors[sDeleteCurls[tCurl]]
             curl.cleanup tCurl
             delete variable sDeleteCurls[tCurl]
             add 1 to sDeleteState["numDone"]
          end if
       end repeat
-       
+      
       if (sDeleteState["numDone"] < sDeleteState["numItems"]) then
          send "s3priv_checkMultiDelete" to me in 50 millisecs
       else
@@ -1010,7 +1026,8 @@ on s3priv_doMultiGet
          put s3.getData.curl(L) into tCurl
          put L into sGetCurls[tCurl]
          curl.execute tCurl
-         if "s3priv_checkMultiGet" is not in the pendingmessages then send "s3priv_checkMultiGet" to me in 10 millisecs
+         if "s3priv_checkMultiGet" is not in the pendingmessages then \
+               send "s3priv_checkMultiGet" to me in 10 millisecs
       end if
    end repeat
 end s3priv_doMultiGet
@@ -1029,7 +1046,7 @@ on s3priv_checkMultiGet
             add 1 to sGetState["numDone"]
          end if
       end repeat
-       
+      
       if (sGetState["numDone"] < sGetState["numItems"]) then
          send "s3priv_checkMultiGet" to me in 100 millisecs
       else
@@ -1113,7 +1130,8 @@ on s3priv_doMultiPut
          put s3.putData.curl(L, sPutData[L]) into tCurl
          put L into sGetCurls[tCurl]
          curl.execute tCurl
-         if "s3priv_checkMultiPut" is not in the pendingmessages then send "s3priv_checkMultiPut" to me in 10 millisecs
+         if "s3priv_checkMultiPut" is not in the pendingmessages then \
+               send "s3priv_checkMultiPut" to me in 10 millisecs
       end if
    end repeat
 end s3priv_doMultiPut
@@ -1147,7 +1165,7 @@ function s3.multiPutStatus
 end s3.multiPutStatus
 
 function s3.multiPutDone
-    return sPutState["status"] is in "cancelled,error,done"
+   return sPutState["status"] is in "cancelled,error,done"
 end s3.multiPutDone
 
 function s3.multiPutErrors
@@ -1220,37 +1238,41 @@ private function s3.curl pArray
       set the itemdelimiter to comma
    end if
    put the internet date into pArray["Date"]
-    
+   
    put authString.s3(pArray) into pArray["Authorization"]
-    
+   
    ### make the 'virtual host' style url ie. http://myBucket.s3.amazonaws.com
    put i.vhUrl(pArray["bucket"]) into tUrl
    if pArray["object"] is not empty then put pArray["object"] after tUrl
-   if pArray["subresource"] is not empty then put "?" & pArray["subresource"] after tUrl
+   if pArray["subresource"] is not empty then put "?" & pArray["subresource"] \
+         after tUrl
    put 0 into tCurl
-    
+   
    ### get a curl instance
    repeat  until tCurl > 0 or sCancel
       put curl.new() into tCurl
       if tCurl = 0 then wait 50 millisecs with messages
    end repeat
-    
+   
    if sCancel then
       if tCurl > 0 then curl.cleanup tCurl
       return 0
    end if
-    
+   
    curl.setUrl tCurl, tUrl
    curl.setMethod tCurl, pArray["httpMethod"]
-    
-   if pArray["inputFile"] is not empty then curl.setInputFile tCurl, pArray["inputFile"]
-   if pArray["outputFile"] is not empty then curl.setOutputFile tCurl, pArray["outputFile"]
-    
+   
+   if pArray["inputFile"] is not empty then \
+         curl.setInputFile tCurl, pArray["inputFile"]
+   if pArray["outputFile"] is not empty then \
+         curl.setOutputFile tCurl, pArray["outputFile"]
+   
    ### discard elements that are not wanted as http headers
-   repeat for each item i in "s3path,bucket,object,httpmethod,subresource,inputfile,outputfile"
+   repeat for each item i in \
+         "s3path,bucket,object,httpmethod,subresource,inputfile,outputfile"
       delete variable pArray[i]
    end repeat
-    
+   
    if pArray["httpMethod"] is "PUT" then put "100-Continue" into pArray["Expect"]
    curl.setHeaders tCurl, pArray
    return tCurl
@@ -1269,8 +1291,10 @@ private function s3.pathStyleCurl pArray
    put the internet date into pArray["Date"]
    put "/" into pArray["uri"]
    if pArray["bucket"] is not empty then put pArray["bucket"] after pArray["uri"]
-   if pArray["object"] is not empty then put "/" & pArray["object"] after pArray["uri"]
-   if pArray["subresource"] is in "acl,logging,location" then put "?" & pArray["subresource"] after pArray["uri"]
+   if pArray["object"] is not empty then \
+         put "/" & pArray["object"] after pArray["uri"]
+   if pArray["subresource"] is in "acl,logging,location" then \
+         put "?" & pArray["subresource"] after pArray["uri"]
    
    put authString.s3(pArray) into pArray["Authorization"]
    
@@ -1279,21 +1303,22 @@ private function s3.pathStyleCurl pArray
       put curl.new() into tCurl
       if tCurl = 0 then wait 50 millisecs with messages
    end repeat
-    
+   
    if sCancel then
       if tCurl > 0 then curl.cleanup tCurl
       return 0
    end if
-    
+   
    curl.setUrl tCurl, s3BaseUrl() & pArray["uri"]
    curl.setMethod tCurl, pArray["httpMethod"]
-    
+   
    get pArray["inputFile"]
    if it is not empty then curl.setInputFile tCurl, it
    get pArray["outputFile"]
    if it is not empty then curl.setOutputFile tCurl, it
-    
-   repeat for each item i in "uri,bucket,object,httpmethod,subresource,inputfile,outputfile"
+   
+   repeat for each item i in \
+         "uri,bucket,object,httpmethod,subresource,inputfile,outputfile"
       delete variable pArray[i]
    end repeat
    if pArray["httpMethod"] is "PUT" then put "100-Continue" into pArray["Expect"]
@@ -1319,12 +1344,14 @@ end makeVHurl
 -----
 
 private function makeSubResource pPrefix, pDelimiter, pMarker, pMaxkeys
-      if pPrefix is not empty then put "prefix=" & urlencode(pPrefix) & "&" after tSubRes
-      if pMarker is not empty then put "marker=" & urlencode(pMarker) & "&" after tSubRes
-      if pMaxkeys is not empty then put "max-keys=" & pMaxkeys & "&" after tSubRes
-      if pDelimiter is not empty then put "delimiter=" & pDelimiter after tSubRes
-      if char -1 of tSubRes is "&" then delete char -1 of tSubRes
-      return tSubRes
+   if pPrefix is not empty then \
+         put "prefix=" & urlencode(pPrefix) & "&" after tSubRes
+   if pMarker is not empty then \
+         put "marker=" & urlencode(pMarker) & "&" after tSubRes
+   if pMaxkeys is not empty then put "max-keys=" & pMaxkeys & "&" after tSubRes
+   if pDelimiter is not empty then put "delimiter=" & pDelimiter after tSubRes
+   if char -1 of tSubRes is "&" then delete char -1 of tSubRes
+   return tSubRes
 end makeSubResource
 
 -----
@@ -1363,21 +1390,26 @@ private function authString.s3 pArray
    
    put "/" after tStringToSign
    if pArray["bucket"] is not empty then put pArray["bucket"] after tStringToSign
-   if pArray["object"] is empty and pArray["bucket"] is not empty and pArray["httpMethod"] is not "PUT" then put "/" after tStringToSign
-   if pArray["object"] is not empty then put "/" & pArray["object"] after tStringToSign
-   if pArray["subresource"] is in "acl,logging,location" then put "?" & pArray["subresource"] after tStringToSign
-    
+   if pArray["object"] is empty and pArray["bucket"] is not empty and \
+         pArray["httpMethod"] is not "PUT" then put "/" after tStringToSign
+   if pArray["object"] is not empty then \
+         put "/" & pArray["object"] after tStringToSign
+   if pArray["subresource"] is in "acl,logging,location" then \
+         put "?" & pArray["subresource"] after tStringToSign
+   
    -- put tStringToSign
    -- wait 5 seconds
    -- put length(tStringToSign)
-    
-   return "AWS" && getAwsAccessKey() & ":" & hmacSha1.b64(tStringToSign, getAwsSecretkey())
+   
+   return "AWS" && getAwsAccessKey() & ":" & \
+         hmacSha1.b64(tStringToSign, getAwsSecretkey())
 end authString.s3 
 
 -----
 
 private function s3.cannedAcl pCannedAcl
-   if pCannedAcl is not among the items of "private,public-read,public-read-write,authenticated-read" then
+   if pCannedAcl is not among the items of \
+         "private,public-read,public-read-write,authenticated-read" then
       put "private" into pCannedAcl
    end if
    return pCannedAcl
@@ -1399,7 +1431,8 @@ private function splitS3path pPath
 end splitS3path
 
 private function s3.simpleError pErrorData
-   if line 1 of pErrorData begins with "error" then put line 1 of pErrorData into tError
+   if line 1 of pErrorData begins with "error" then \
+         put line 1 of pErrorData into tError
    get lineoffset("<?xml", pErrorData)
    if it > 0 then
       put s3xml.simpleResponse(line it to -1 of pErrorData) into tS3Error
@@ -1496,7 +1529,7 @@ private function fsfolders @pArray, pFullPaths
    return tList
 end fsfolders
 
----==---==---==---==---==---==---==---==---==---==---==---==---==---
+---===---===---===---===---===---===---===---===---===---===---===---===---===---
 
 
 private function s3DateToSeconds pDate
@@ -1537,13 +1570,14 @@ private function luHeaders pArray
       set the itemdelimiter to comma
    end if
    put the internet date into pArray["Date"]
-    
+   
    put authString.s3(pArray) into pArray["Authorization"]
-    
+   
    ### make the 'virtual host' style url ie. http://myBucket.s3.amazonaws.com
    put i.vhUrl(pArray["bucket"]) into tUrl
    if pArray["object"] is not empty then put pArray["object"] after tUrl
-   if pArray["subresource"] is not empty then put "?" & pArray["subresource"] after tUrl
+   if pArray["subresource"] is not empty then \
+         put "?" & pArray["subresource"] after tUrl
    
    repeat for each item i in "bucket,object,s3path,httpmethod"
       delete variable pArray[i]
@@ -1601,13 +1635,14 @@ function s3.response pXml
          put true into xmlAnyway
          break
    end switch
-    
+   
    revDeleteXmlTree tTree
    if xmlAnyway then
       return pXml
    else
       if tArray["status"] is not "error" then put "ok" into tArray["status"]
-      if tNonXml is not empty then put word 2 to -1 of tNonXml into tArray["curlerror"]
+      if tNonXml is not empty then \
+            put word 2 to -1 of tNonXml into tArray["curlerror"]
       return tArray
    end if
 end s3.response
@@ -1641,7 +1676,7 @@ private function s3xml.errorResponseA pTree, pRoot
    put "error" into tArray["status"]
    return tArray
 end s3xml.errorResponseA
-   
+
 
 private function s3xml.errorResponse pTree
    put revXmlRootNode(pTree) into tRootNode
@@ -1659,23 +1694,25 @@ end s3xml.errorResponse
 private function s3xml.listBucketA pTree, pRootNode
    set the itemdelimiter to "/"
    put revXmlFirstChild(pTree, pRootNode) into tNode
-    
+   
    repeat while tNode is not empty and "xmlerr" is not in tNode
       if "Contents" is in tNode then
          put s3xml.listBucketContentNode(pTree, pNode) into tContent
          put tContent["key"] into tObjectName
          delete variable tContent["key"]
-          
+         
          put tObjectName into tArray["nextMarker"]
          put tContent into tArray["objects"][tObjectName]
       else if "CommonPrefixes" is in tNode then
-         put char 1 to - 2 of revXmlNodeContents(pTree, pNode & "/Prefix") & cr after tArray["prefixes"]
+         put char 1 to - 2 of revXmlNodeContents(pTree, pNode & "/Prefix") & cr \
+               after tArray["prefixes"]
       else
-         put revXmlNodeContents(pTree, pNode) into tArray["request"][item -1 of tNode]
+         put revXmlNodeContents(pTree, pNode) \
+               into tArray["request"][item -1 of tNode]
       end if
       put revXmlNextSibling(pTree,  pNode) into tNode
    end repeat 
-    
+   
    if tArray["prefixes"] is not empty then delete char -1 of tArray["prefixes"]
    return tArray
    
@@ -1690,27 +1727,30 @@ private function s3xml.listBucket pXml
       set the itemdelimiter to "/"
       put revXmlRootNode(tTree) into tRootNode
       put revXmlFirstChild(tTree, tRootNode) into tNode
-       
+      
       repeat while tNode is not empty and "xmlerr" is not in tNode
          if "Contents" is in tNode then
             put s3xml.listBucketContentNode(tTree, tNode) into tContent
             put tContent["key"] into tObjectName
             delete variable tContent["key"]
-             
+            
             put tObjectName into tArray["request"]["nextMarker"]
             put tContent into tArray["objects"][tObjectName]
          else if "CommonPrefixes" is in tNode then
-            put char 1 to - 2 of revXmlNodeContents(tTree, tNode & "/Prefix") & cr after tArray["prefixes"]
+            put char 1 to - 2 of revXmlNodeContents(tTree, tNode & "/Prefix") \
+                  & cr after tArray["prefixes"]
          else
-            put revXmlNodeContents(tTree, tNode) into tArray["request"][item -1 of tNode]
+            put revXmlNodeContents(tTree, tNode) \
+                  into tArray["request"][item -1 of tNode]
          end if
          put revXmlNextSibling(tTree,  tNode) into tNode
       end repeat 
-       
-      if tArray["prefixes"] is not empty then delete char -1 of tArray["prefixes"]
+      
+      if tArray["prefixes"] is not empty then \
+            delete char -1 of tArray["prefixes"]
       put "ok" into tArray["request"]["status"]
    end if
-    
+   
    
    revDeleteXmlTree tTree
    return tArray
@@ -1719,31 +1759,35 @@ end s3xml.listBucket
 -----
 
 private function s3xml.listBucketContentNode pTree, pNode
-   put revXmlNodeContents(pTree, pNode & "/LastModified") into tArray["modified-date"]
+   put revXmlNodeContents(pTree, pNode & "/LastModified") \
+         into tArray["modified-date"]
    put s3DateToSecondsB(tArray["modified-date"]) into tArray["modified-seconds"]
    get revXmlNodeContents(pTree, pNode & "/ETag")
    put char 2 to -2 of it into tArray["md5"]
    put revXmlNodeContents(pTree, pNode & "/Size") into tArray["size"]
-   put revXmlNodeContents(pTree, pNode & "/StorageClass") into tArray["storageclass"]
+   put revXmlNodeContents(pTree, pNode & "/StorageClass") \
+         into tArray["storageclass"]
    put s3xml.owner(pTree, pNode & "/Owner") into tOwner
    union tArray with tOwner
    put utf8decode(revXmlNodeContents(pTree, pNode & "/Key")) into tArray["key"]
-    
+   
    return tArray
 end s3xml.listBucketContentNode
 
 -----
 
 private function s3xml.owner pTree, pNode
-      put revXmlNodeContents(pTree, pNode & "/ID") into tArray["ownerid"]
-      put revXmlNodeContents(pTree, pNode & "/DisplayName") into tArray["ownerdisplayname"]
-      return tArray
+   put revXmlNodeContents(pTree, pNode & "/ID") into tArray["ownerid"]
+   put revXmlNodeContents(pTree, pNode & "/DisplayName") \
+         into tArray["ownerdisplayname"]
+   return tArray
 end s3xml.owner
 
 private function s3xml.CanonicalUser pTree, pNode
-      put revXmlNodeContents(pTree, pNode & "/ID") into tArray["id"]
-      put revXmlNodeContents(pTree, pNode & "/DisplayName") into tArray["displayname"]
-      return tArray
+   put revXmlNodeContents(pTree, pNode & "/ID") into tArray["id"]
+   put revXmlNodeContents(pTree, pNode & "/DisplayName") \
+         into tArray["displayname"]
+   return tArray
 end s3xml.CanonicalUser
 
 -----
@@ -1755,8 +1799,9 @@ private function s3xml.listAllMyBucketsA pTree, pRoot
    put revXmlFirstChild(pTree, tNode) into tNode
    repeat while tNode is not empty and "xmlerr" is  not in tNode
       put revXmlNodeContents(pTree, tNode & "/Name") into tName
-      put revXmlNodeContents(pTree, tNode & "/CreationDate") into tArray["buckets"][tName]
-       
+      put revXmlNodeContents(pTree, tNode & "/CreationDate") \
+            into tArray["buckets"][tName]
+      
       put revXmlNextSibling(pTree, tNode) into tNode
    end repeat
    return tArray
@@ -1779,15 +1824,16 @@ private function s3xml.listAllMyBuckets pXml
    put revXmlFirstChild(tTree, tNode) into tNode
    repeat while tNode is not empty and "xmlerr" is  not in tNode
       put revXmlNodeContents(tTree, tNode & "/Name") into tName
-      put revXmlNodeContents(tTree, tNode & "/CreationDate") into tArray["buckets"][tName]
-       
+      put revXmlNodeContents(tTree, tNode & "/CreationDate") \
+            into tArray["buckets"][tName]
+      
       put revXmlNextSibling(tTree, tNode) into tNode
    end repeat
    
    revDeleteXmlTree tTree
    return tArray
 end s3xml.listAllMyBuckets
-   
+
 
 -----
 
@@ -1796,8 +1842,10 @@ private function s3xml.getLoggingA pTree, pRoot
    put ("LoggingEnabled" is in it) into tArray["enabled"]
    if tArray["enabled"] then
       put pRoot & "/LoggingEnabled" into tNode
-      put revXmlNodeContents(pTree, tNode & "/TargetBucket") into tArray["targetbucket"]
-      put revXmlNodeContents(pTree, tNode & "/TargetPrefix") into tArray["targetprefix"]
+      put revXmlNodeContents(pTree, tNode & "/TargetBucket") \
+            into tArray["targetbucket"]
+      put revXmlNodeContents(pTree, tNode & "/TargetPrefix") \
+            into tArray["targetprefix"]
    end if
    return tArray
 end s3xml.getLoggingA
@@ -1809,8 +1857,10 @@ private function s3xml.getLogging pXml
    put ("LoggingEnabled" is in it) into tArray["enabled"]
    if tArray["enabled"] then
       put "/LoggingEnabled" after tNode
-      put revXmlNodeContents(tTree, tNode & "/TargetBucket") into tArray["targetbucket"]
-      put revXmlNodeContents(tTree, tNode & "/TargetPrefix") into tArray["targetprefix"]
+      put revXmlNodeContents(tTree, tNode & "/TargetBucket") \
+            into tArray["targetbucket"]
+      put revXmlNodeContents(tTree, tNode & "/TargetPrefix") \
+            into tArray["targetprefix"]
    end if
    revDeleteXmlTree tTree
    return tArray
@@ -1826,7 +1876,7 @@ private function s3xml.getAclA pTree, pRoot
    repeat while tNode is not empty and "xmlerr" is not in tNode
       add 1 to grantCount
       put s3xml.grant(pTree, tNode) into tArray["grants"][grantCount]
-       
+      
       put revXmlNextSibling(pTree, tNode) into tNode
    end repeat
    
@@ -1843,7 +1893,7 @@ private function s3xml.getAcl pXml
    repeat while tNode is not empty and "xmlerr" is not in tNode
       add 1 to grantCount
       put s3xml.grant(tTree, tNode) into tArray["grants"][grantCount]
-       
+      
       put revXmlNextSibling(tTree, tNode) into tNode
    end repeat
    revDeleteXmlTree tTree
@@ -1864,7 +1914,8 @@ private function s3xml.grant pTree, pNode
          put revXmlNodeContents(pTree, pNode & "/Grantee/Uri") into tArray["uri"]
          break
       case "AmazonCustomerByEmail"
-         put revXmlNodeContents(pTree, pNode & "/Grantee/EmailAddress") into tArray["emailaddress"]
+         put revXmlNodeContents(pTree, pNode & "/Grantee/EmailAddress") \
+               into tArray["emailaddress"]
          break
    end switch
    put revXmlNodeContents(pTree, pNode & "/Permission") into tArray["permission"]
@@ -1887,7 +1938,8 @@ private function s3xml.copyObject pXml
       put s3xml.errorResponse(tTree) into tArray
       put "error" into tArray["status"]
    else
-      put revXmlNodeContents(tTree, "CopyObjectResult/LastModified") into tArray["lastmodified"]
+      put revXmlNodeContents(tTree, "CopyObjectResult/LastModified") \
+            into tArray["lastmodified"]
       put revXmlNodeContents(tTree, "CopyObjectResult/ETag") into tArray["md5"]
       replace quote with empty in tArray["md5"]
       put "ok" into tArray["status"]
@@ -1896,7 +1948,8 @@ private function s3xml.copyObject pXml
 end s3xml.copyObject
 
 private function s3xml.copyObjectA pTree, pRoot
-   put revXmlNodeContents(pTree, pRoot & "/LastModified") into tArray["lastmodified"]
+   put revXmlNodeContents(pTree, pRoot & "/LastModified") \
+         into tArray["lastmodified"]
    put revXmlNodeContents(pTree, pRoot & "/ETag") into tArray["md5"]
    replace quote with empty in tArray["md5"]
    put "ok" into tArray["status"]
@@ -1907,9 +1960,11 @@ end s3xml.copyObjectA
 
 private function s3xml.postResponse pTree, pRoot
    put revXmlNodeContents(pTree, pRoot & "/Bucket") into tArray["bucket"]
-   put urldecode(revXmlNodeContents(pTree, pRoot & "/Location")) into tArray["url"]
+   put urldecode(revXmlNodeContents(pTree, pRoot & "/Location")) \
+         into tArray["url"]
    put revXmlNodeContents(pTree, pRoot & "/Key") into tArray["key"]
-   put char 2 to -2 of revXmlNodeContents(pTree, pRoot & "/ETag") into tArray["md5"]
+   put char 2 to -2 of revXmlNodeContents(pTree, pRoot & "/ETag") \
+         into tArray["md5"]
    return tArray
 end s3xml.postResponse
 
@@ -1957,7 +2012,8 @@ function makeAcl pArray
    put "<AccessControlPolicy>" into tAcl
    put "<Owner>" after tAcl
    put "<ID>" & pArray["owner"]["id"] & "</ID>" after tAcl
-   put "<DisplayName>" & pArray["owner"]["displayname"] & "</DisplayName>" after tAcl
+   put "<DisplayName>" & pArray["owner"]["displayname"] & "</DisplayName>" \
+         after tAcl
    put "</Owner>" after tAcl
    
    put "<AccessControlList>" after tAcl
@@ -1967,7 +2023,8 @@ function makeAcl pArray
          case "CanonicalUser"
             put "<Grantee xsi:type=" & q("CanonicalUser")  & ">" after tAcl
             put "<ID>" & pArray["grants"][n]["id"] & "</ID>" after tAcl
-            put "<DisplayName>" &  pArray["grants"][n]["displayname"] & "</DisplayName>" after tAcl
+            put "<DisplayName>" &  pArray["grants"][n]["displayname"] & \
+                  "</DisplayName>" after tAcl
             break
          case "Group"
             put "<Grantee xsi:type=" & q("Group")  & ">" after tAcl
@@ -1975,7 +2032,8 @@ function makeAcl pArray
             break
       end switch
       put "</Grantee>" after tAcl
-      put "<Permission>" & pArray["grants"][n]["permission"] & "</Permission>" after tAcl
+      put "<Permission>" & pArray["grants"][n]["permission"] & "</Permission>" \
+            after tAcl
       put "</Grant>" after tAcl
    end repeat
    put "</AccessControlList></AccessControlPolicy>" after tAcl

@@ -92,7 +92,8 @@ function ec2.describeInstances pFormat
    
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    
    put xmlDescribeInstances(tResponse) into tArray
    return tArray
@@ -110,7 +111,8 @@ on ec2.instance.init pArray
    put "m1.small" into sRunInstance["InstanceType"]
    
    repeat for each line L in the keys of pArray
-      if L is among the items of "KeyName,MinCount,MaxCount,InstanceType" then put pArray[L] into sRunInstance[L]
+      if L is among the items of "KeyName,MinCount,MaxCount,InstanceType" then \
+            put pArray[L] into sRunInstance[L]
       if "SecurityGroup" is in L then put pArray[L] into sRunInstance[L]
    end repeat
 end ec2.instance.init
@@ -132,7 +134,8 @@ on ec2.instance.setKeypair pkeyPair
 end ec2.instance.setKeypair
 
 on ec2.instance.setAvailabilityZone pZone
-   if pZone is not empty then put pZone into sRunInstance["Placement.AvailabilityZone"]
+   if pZone is not empty then put pZone into \
+         sRunInstance["Placement.AvailabilityZone"]
 end ec2.instance.setAvailabilityZone
 
 on ec2.instance.setMinMax pMin, pMax
@@ -162,8 +165,10 @@ on ec2.instance.setBlockDeviceMappings pBlockDeviceList
    set the itemdelimiter to "="
    repeat for each line L in pBlockDeviceList
       add 1 to n
-      put item 1 of L into sRunInstance["BlockDeviceMapping." & n & ".VirtualName"]
-      put item 2 of L into sRunInstance["BlockDeviceMapping." & n & ".DeviceName"]
+      put item 1 of L into \
+            sRunInstance["BlockDeviceMapping." & n & ".VirtualName"]
+      put item 2 of L into \
+            sRunInstance["BlockDeviceMapping." & n & ".DeviceName"]
    end repeat
 end ec2.instance.setBlockDeviceMappings
 
@@ -180,7 +185,8 @@ function ec2.instance.run
    
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    
    return xmlRunInstances(tResponse)
 end ec2.instance.run
@@ -193,16 +199,19 @@ function ec2.RunInstancesA pArray
    get pArray["MinCount"]
    if it is not a number or it < 1 or it > 10 then put 1 into pArray["MinCount"]
    get pArray["MaxCount"]
-   if it is not a number or it < pArray["MinCount"] or it > 10 then put pArray["MinCount"] into pArray["MaxCount"]
+   if it is not a number or it < pArray["MinCount"] or it > 10 then \
+         put pArray["MinCount"] into pArray["MaxCount"]
    if pArray["SecurityGroup.1"] is empty then return "error: no security group"
-   if pArray["InstanceType"] is not in  "m1.small,m1.large,m1.xlarge,c1.medium,c1.xlarge" then
+   if pArray["InstanceType"] is not in \
+         "m1.small,m1.large,m1.xlarge,c1.medium,c1.xlarge" then
       return "error: invalid instance type"
    end if
    
    put ec2.send(pArray) into tResponse
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    
    return xmlRunInstances(tResponse)
    
@@ -210,7 +219,8 @@ end ec2.RunInstancesA
 
 -----
 
-function ec2.runInstances pImageId, pMinCount, pMaxCount, pKeyPair, pType, pFormat
+function ec2.runInstances pImageId, pMinCount, pMaxCount, \
+      pKeyPair, pType, pFormat
    
    if pKeyPair is empty then put sDefaultKeypair into pKeyPair
    if pMinCount is not an integer then put 1 into pMinCount
@@ -227,14 +237,15 @@ function ec2.runInstances pImageId, pMinCount, pMaxCount, pKeyPair, pType, pForm
    else
       put "m1.small" into tQarray["InstanceType"]
    end if
-    
+   
    put ec2.send(sRunInstance) into tResponse
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    
    return xmlRunInstances(tResponse)
-    
+   
 end ec2.runInstances
 
 -----
@@ -250,7 +261,8 @@ function ec2.rebootInstances pInstanceList, pFormat
    
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    return "<return>true" is in tResponse
 end ec2.rebootInstances
 
@@ -266,7 +278,8 @@ function ec2.terminateInstances pInstanceList, pFormat
    put ec2.send(tQarray) into tResponse
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    
    put xmlTerminateInstances(tResponse) into tArray
    if pFormat is "list" then
@@ -306,7 +319,8 @@ function ec2.describeImages pImages, pOwners, pExecutableBy, pFormat
    put ec2.send(tQarray) into tResponse
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    
    put xmlDescribeImages(tResponse) into tArray
    
@@ -328,7 +342,8 @@ function ec2.registerImage pS3Location
    put ec2.send(tQarray) into tResponse
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    
    return xmlSimpleResponse(tResponse, "imageId")
 end ec2.registerImage
@@ -343,7 +358,8 @@ function ec2.deregisterImage pImageId
    
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    
    return "<return>true" is in tResponse
 end ec2.deregisterImage
@@ -359,7 +375,8 @@ function ec2.describeImageAttribute pImageId, pAttribute, pFormat
    
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    
    put xmlDescribeImageAttribute(tResponse) into tArray
    return tArray
@@ -382,7 +399,8 @@ function ec2.resetImageAttribute pImageId, pFormat
    
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    return "<return>true" is in tResponse
 end ec2.resetImageAttribute
 
@@ -397,7 +415,8 @@ function ec2.describeAddresses pFormat
    
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return linerize(tResponse)
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    
    put xmlDescribeAddresses(tResponse) into tArray
    if pFormat is "list" then combine tArray by cr and "="
@@ -413,7 +432,8 @@ function ec2.allocateAddress pFormat
    
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    return xmlSimpleResponse(tResponse, "publicIp")
 end ec2.allocateAddress
 
@@ -427,7 +447,8 @@ function ec2.releaseAddress pAddress, pFormat
    
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    return "<return>true" is in tResponse
 end ec2.releaseAddress
 
@@ -442,7 +463,8 @@ function ec2.associateAddress pInstance, pAddress, pFormat
    
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    return "<return>true" is in tResponse
 end ec2.associateAddress
 
@@ -456,7 +478,8 @@ function ec2.disassociateAddress pAddress, pFormat
    
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    return "<return>true" is in tResponse
 end ec2.disassociateAddress
 
@@ -476,7 +499,8 @@ function ec2.describeGroups pGrpNames, pFormat
    
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return linerize(tResponse)
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    put xmlDescribeSecurityGroups(tResponse) into tArray
    return tArray
 end ec2.describeGroups
@@ -492,7 +516,8 @@ function ec2.createGroup pName, pDescription
    
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    return "<return>true" is in tResponse
 end ec2.createGroup
 
@@ -501,18 +526,20 @@ end ec2.createGroup
 function ec2.deleteGroup pGrpName
    put "DeleteSecurityGroup" into tQarray["Action"]
    put pGrpName into tQarray["GroupName"]
-    
+   
    put ec2.send(tQarray) into tResponse
    
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    return "<return>true" is in tResponse
 end ec2.deleteGroup
 
 -----
 
-function ec2.authorizeGroup pGrpName, pFromPort, pToPort, pProtocol, pCidrIp, pFormat
+function ec2.authorizeGroup pGrpName, pFromPort, pToPort, \
+         pProtocol, pCidrIp, pFormat
    
    put "AuthorizeSecurityGroupIngress" into tQarray["Action"]
    put pGrpName into tQarray["GroupName"]
@@ -520,18 +547,20 @@ function ec2.authorizeGroup pGrpName, pFromPort, pToPort, pProtocol, pCidrIp, pF
    put pToPort into tQarray["ToPort"]
    put pProtocol into tQarray["IpProtocol"]
    if pCidrIp is empty then put "0.0.0.0/0" into tQarray["CidrIp"]
-    
+   
    put ec2.send(tQarray) into tResponse
    
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    return "<return>true" is in tResponse
 end ec2.authorizeGroup
 
 -----
 
-function ec2.authorizeGroupByPair pGrpName, pProtocol, pSourceOwner, pSourceGroup, pFormat
+function ec2.authorizeGroupByPair pGrpName, pProtocol, pSourceOwner, \
+         pSourceGroup, pFormat
    
    put "AuthorizeSecurityGroupIngress" into tQarray["Action"]
    put pGrpName into tQarray["GroupName"]
@@ -543,13 +572,15 @@ function ec2.authorizeGroupByPair pGrpName, pProtocol, pSourceOwner, pSourceGrou
    
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    return "<return>true" is in tResponse
 end ec2.authorizeGroupByPair
 
 -----
 
-function ec2.deauthorizeGroup pGrpName, pFromPort, pToPort, pProtocol, pCidrIp, pFormat
+function ec2.deauthorizeGroup pGrpName, pFromPort, pToPort, pProtocol, \
+         pCidrIp, pFormat
    
    put "RevokeSecurityGroupIngress" into tQarray["Action"]
    put pGrpName into tQarray["GroupName"]
@@ -557,17 +588,19 @@ function ec2.deauthorizeGroup pGrpName, pFromPort, pToPort, pProtocol, pCidrIp, 
    put pToPort into tQarray["ToPort"]
    put pProtocol into tQarray["IpProtocol"]
    if pCidrIp is empty then put "0.0.0.0/0" into tQarray["CidrIp"]
-    
+   
    put ec2.send(tQarray) into tResponse
-    
+   
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    return "<return>true" is in tResponse
 end ec2.deauthorizeGroup
 
 -----
-function ec2.deauthorizeGroupByPair pGrpName, pProtocol, pSourceOwner, pSourceGroup, pFormat
+function ec2.deauthorizeGroupByPair pGrpName, pProtocol, pSourceOwner, \
+         pSourceGroup, pFormat
    
    put "RevokeSecurityGroupIngress" into tQarray["Action"]
    put pGrpName into tQarray["GroupName"]
@@ -579,18 +612,21 @@ function ec2.deauthorizeGroupByPair pGrpName, pProtocol, pSourceOwner, pSourceGr
    
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    return "<return>true" is in tResponse
 end ec2.deauthorizeGroupByPair
 ----- 
 
-private function makeGroupParams pGrpName, pFromPort, pToPort, pProtocol, pCidrIp, pSourceOwnerId, pSourceGroup
+private function makeGroupParams pGrpName, pFromPort, pToPort, pProtocol, \
+         pCidrIp, pSourceOwnerId, pSourceGroup
    
    put pGrpName into tQarray["GroupName"]
    put pFromPort into tQarray["FromPort"]
    put pToPort into tQarray["ToPort"]
    put pProtocol into tQarray["IpProtocol"]
-   if pSourceOwnerId is empty and pCidrIp is empty then put "0.0.0.0/0" into tQarray["CidrIp"]
+   if pSourceOwnerId is empty and pCidrIp is empty then \
+         put "0.0.0.0/0" into tQarray["CidrIp"]
    if pCidrIp is empty then
       put pSourceOwnerId into tQarray["SourceSecurityGroupOwnerId"]
       put pSourceGroup into tQarray["SourceSecurityGroupName"]
@@ -633,7 +669,8 @@ function ec2.createVolume pSize, pZone, pSnapshot, pFormat
    
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    put xmlCreateVolume(tResponse) into tArray
    return tArray
 end ec2.createVolume
@@ -651,7 +688,8 @@ function ec2.attachVolume pVolumeId, pInstanceId, pDevice
    
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    return tResponse
    put xmlAttchVolume(tResponse) into tArray
    return tArray
@@ -671,7 +709,8 @@ function ec2.detachVolume pVolumeId, pInstanceId, pDevice, pForce
    
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    return tResponse
    put xmlDetachVolume(tResponse) into tArray
    return tArray
@@ -687,7 +726,8 @@ function ec2.deleteVolume pVolumeId
    
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    return tResponse
    put xmlDeleteVolume(tResponse) into tArray
    return tArray
@@ -725,7 +765,8 @@ function ec2.createSnapshot pVolumeId
    
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    put xmlCreateSnapshot(tResponse) into tArray
    return tArray
 end ec2.createSnapshot
@@ -740,7 +781,8 @@ function ec2.deleteSnapshot pSnapshotId
    
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    put xmlDeleteSnapshot(tResponse) into tArray
    return tArray
 end ec2.deleteSnapshot
@@ -756,7 +798,8 @@ function ec2.createKeypair pName, pFormat
    
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlAllChildren(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlAllChildren(tResponse, "Code")
    
    put xmlCreateKeyPair(tResponse) into tArray
    return tArray
@@ -772,7 +815,8 @@ function ec2.deleteKeypair pName, pFormat
    
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    return "<return>true" is in tResponse
 end ec2.deleteKeypair
 
@@ -784,7 +828,8 @@ function ec2.describeKeypairs pFormat
    
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    
    put xmlDescribeKeyPairs(tResponse) into tArray
    if pFormat is "list" then return the keys of tArray
@@ -809,7 +854,8 @@ function ec2.describeRegions pFormat, pRegions
    
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    
    put xmlDescribeRegions(tResponse) into tArray
    if pFormat is "list" then combine tArray by cr and "="
@@ -824,7 +870,8 @@ function ec2.describeAvailabilityZones pFormat
    
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
-   if "<errors>" is in tResponse then return "error:" && xmlError(tResponse, "Code")
+   if "<errors>" is in tResponse then \
+         return "error:" && xmlError(tResponse, "Code")
    
    put xmlDescribeAvailabilityZones(tResponse) into tArray
    if pFormat is "list" then combine tArray by cr and "="
@@ -866,7 +913,7 @@ end ec2.listMetrics
 function ec2.getMetricStatistics
    put "GetMetricStatistics" into tQarray["Action"]
    
-    
+   
    put cw.send(tQarray) into tResponse
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return tResponse
@@ -936,7 +983,8 @@ private function ec2.makePostData pQarray
    put the keys of pQarray into tKeys
    sort lines of tKeys
    repeat for each line L in tKeys
-      if pQarray[L] is not empty then put  L & "=" & urlencode(pQarray[L]) & "&" after tQueryString
+      if pQarray[L] is not empty then \
+            put L & "=" & urlencode(pQarray[L]) & "&" after tQueryString
    end repeat
    delete char -1 of tQueryString
    
@@ -962,7 +1010,8 @@ private function cw.makePostData pQarray
    put the keys of pQarray into tKeys
    sort lines of tKeys
    repeat for each line L in tKeys
-      if pQarray[L] is not empty then put  L & "=" & urlencode(pQarray[L]) & "&" after tQueryString
+      if pQarray[L] is not empty then \
+         put L & "=" & urlencode(pQarray[L]) & "&" after tQueryString
    end repeat
    delete char -1 of tQueryString
 end cw.makePostData
@@ -1005,8 +1054,8 @@ private function ec2.type2Auth pQarray
    return tAuthstring
 end ec2.type2Auth
 
--=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=---
--=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=---
+--=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=--
+--=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=--
 ------------------------------
 --> xml responses
 ------------------------------
@@ -1028,7 +1077,7 @@ private function xmlDescribeInstances pXml
          put revXmlNodeContents(tTree, tNode & "/instanceId") into tKey
          put runningInstanceType(tTree, tNode) into tInstance
          put tReservationInfo after tInstance
-          
+         
          filter tInstance without empty
          put tInstance into tArray[tKey]
          put revXmlNextSibling(tTree, tNode) into tNode
@@ -1085,20 +1134,33 @@ end xmlTerminateInstances
 
 private function runningInstanceType tTree, tNode, pFormat
    put empty into tInstance
-   addToList tInstance, "instanceId", revXmlNodeContents(tTree, tNode & "/instanceId")
-   addToList tInstance, "imageId", revXmlNodeContents(tTree, tNode & "/imageId")
-   addToList tInstance, "state", instanceStateType(tTree, tNode & "/instanceState", "csv")
-   addToList tInstance, "privateDns", revXmlNodeContents(tTree, tNode & "/privateDnsName")
-   addToList tInstance, "publicDns", revXmlNodeContents(tTree, tNode & "/dnsName")
-   addToList tInstance, "keypair", revXmlNodeContents(tTree, tNode & "/keyName")
-   addToList tInstance, "type", revXmlNodeContents(tTree, tNode & "/instanceType")
-   addToList tInstance, "launchtime", revXmlNodeContents(tTree, tNode & "/launchTime")
-   addToList tInstance, "reason", revXmlNodeContents(tTree, tNode & "/reason")
-   addToList tInstance, "availabilityzone", revXmlNodeContents(tTree, tNode & "/placement/availabilityZone")
-   addToList tInstance, "launchIndex", revXmlNodeContents(tTree, tNode & "/amiLaunchIndex")
-   addToList tInstance, "kernelId", revXmlNodeContents(tTree, tNode & "/kernelId")
-   addToList tInstance, "ramdiskId", revXmlNodeContents(tTree, tNode & "/ramdiskId") 
-    
+   addToList tInstance, "instanceId", \
+         revXmlNodeContents(tTree, tNode & "/instanceId")
+   addToList tInstance, "imageId", \
+         revXmlNodeContents(tTree, tNode & "/imageId")
+   addToList tInstance, "state", \
+         instanceStateType(tTree, tNode & "/instanceState", "csv")
+   addToList tInstance, "privateDns", \
+         revXmlNodeContents(tTree, tNode & "/privateDnsName")
+   addToList tInstance, "publicDns", \
+         revXmlNodeContents(tTree, tNode & "/dnsName")
+   addToList tInstance, "keypair", \
+         revXmlNodeContents(tTree, tNode & "/keyName")
+   addToList tInstance, "type", \
+         revXmlNodeContents(tTree, tNode & "/instanceType")
+   addToList tInstance, "launchtime", \
+         revXmlNodeContents(tTree, tNode & "/launchTime")
+   addToList tInstance, "reason", \
+         revXmlNodeContents(tTree, tNode & "/reason")
+   addToList tInstance, "availabilityzone", \
+         revXmlNodeContents(tTree, tNode & "/placement/availabilityZone")
+   addToList tInstance, "launchIndex", \
+         revXmlNodeContents(tTree, tNode & "/amiLaunchIndex")
+   addToList tInstance, "kernelId", \
+         revXmlNodeContents(tTree, tNode & "/kernelId")
+   addToList tInstance, "ramdiskId", \
+         revXmlNodeContents(tTree, tNode & "/ramdiskId") 
+   
    put revXmlFirstChild(tTree, tNode & "/productCodesSet") into tPCnode
    repeat while tPCnode is not empty and "xmlerr" is not in tPCnode
       get revXmlNodeContents(tTree, tPCnode & "/productCode")
@@ -1115,10 +1177,13 @@ end runningInstanceType
 
 private function terminateInstanceType tTree, tNode, pFormat
    put empty into tInstance
-   addToList tInstance, "instanceId", revXmlNodeContents(tTree, tNode & "/instanceId")
-   addToList tInstance, "shutDownState", instanceStateType(tTree, tNode & "/shutdownState", "csv")
-   addToList tInstance, "previousState", instanceStateType(tTree, tNode & "/previousState", "csv")
-  
+   addToList tInstance, "instanceId", \
+         revXmlNodeContents(tTree, tNode & "/instanceId")
+   addToList tInstance, "shutDownState", \
+         instanceStateType(tTree, tNode & "/shutdownState", "csv")
+   addToList tInstance, "previousState", \
+         instanceStateType(tTree, tNode & "/previousState", "csv")
+   
    if pFormat is "array" then split tInstance by cr and "="
    return tInstance
 end terminateInstanceType
@@ -1145,9 +1210,12 @@ end instanceStateType
 private function reservationInfoType pTree, pNode, pFormat
    
    
-   addToList tReservationInfo, "reservationId", revXmlNodeContents(pTree, pNode & "/reservationId")
-   addToList tReservationInfo, "ownerId", revXmlNodeContents(pTree, pNode & "/ownerId")
-   addToList tReservationInfo, "securitygroups", groupSetType(pTree, pNode & "/groupSet")
+   addToList tReservationInfo, "reservationId", \
+         revXmlNodeContents(pTree, pNode & "/reservationId")
+   addToList tReservationInfo, "ownerId", \
+         revXmlNodeContents(pTree, pNode & "/ownerId")
+   addToList tReservationInfo, "securitygroups", \
+         groupSetType(pTree, pNode & "/groupSet")
    
    if pFormat is "array" then split tReservationInfo by cr and "="
    return tReservationInfo
@@ -1168,8 +1236,10 @@ end groupSetType
 
 private function BlockDeviceMappingItemType pTree, pNode, pFormat
    put empty into tItem
-   addToList tItem, "virtualName", revXmlNodeContents(pTree, pNode & "/virtualName")
-   addToList tItem, "deviceName", revXmlNodeContents(pTree, pNode & "/deviceName")
+   addToList tItem, "virtualName", \
+         revXmlNodeContents(pTree, pNode & "/virtualName")
+   addToList tItem, "deviceName", \
+         revXmlNodeContents(pTree, pNode & "/deviceName")
    
    if pFormat is "array" then split tItem by cr and "="
    return tItem
@@ -1192,7 +1262,7 @@ private function xmlDescribeImages pXml
    put revCreateXmlTree(pXml, true, true, false) into tTree
    put revXmlFirstChild(tTree, "/DescribeImagesResponse/imagesSet/") into tNode
    repeat while tNode is not empty and "xmlerr" is not in tNode
-       
+      
       put DescribeImagesResponseItemType(tTree, tNode, array) into tItem
       put tItem["imageId"] into tKey
       combine tItem by cr and "="
@@ -1214,17 +1284,27 @@ end xmlDescribeImageAttribute
 
 private function DescribeImagesResponseItemType pTree, pNode, pFormat
    put empty into tItem
-   addToList tItem, "imageId", revXmlNodeContents(pTree, pNode & "/imageId")
-   addToList tItem, "imageState", revXmlNodeContents(pTree, pNode & "/imageState")
-   addToList tItem, "imageOwnerId", revXmlNodeContents(pTree, pNode & "/imageOwnerId")
-   addToList tItem, "imageLocation",revXmlNodeContents(pTree, pNode & "/imageLocation")
+   addToList tItem, "imageId", \
+         revXmlNodeContents(pTree, pNode & "/imageId")
+   addToList tItem, "imageState", \
+         revXmlNodeContents(pTree, pNode & "/imageState")
+   addToList tItem, "imageOwnerId", \
+         revXmlNodeContents(pTree, pNode & "/imageOwnerId")
+   addToList tItem, "imageLocation",\
+         revXmlNodeContents(pTree, pNode & "/imageLocation")
    
-   addToList tItem, "isPublic", revXmlNodeContents(pTree, pNode & "/isPublic")
-   addToList tItem, "architecture", revXmlNodeContents(pTree, pNode & "/architecture")
-   addToList tItem, "imageType", revXmlNodeContents(pTree, pNode & "/imageType")
-   addToList tItem, "kernelId", revXmlNodeContents(pTree, pNode & "/kernelId")
-   addToList tItem, "ramdiskId", revXmlNodeContents(pTree, pNode & "/ramdiskId")
-   addToList tItem, "productCodes", productCodesSet(pTree, pNode & "/productCodesSet")
+   addToList tItem, "isPublic", \
+         revXmlNodeContents(pTree, pNode & "/isPublic")
+   addToList tItem, "architecture", \
+         revXmlNodeContents(pTree, pNode & "/architecture")
+   addToList tItem, "imageType", \
+         revXmlNodeContents(pTree, pNode & "/imageType")
+   addToList tItem, "kernelId", \
+         revXmlNodeContents(pTree, pNode & "/kernelId")
+   addToList tItem, "ramdiskId", \
+         revXmlNodeContents(pTree, pNode & "/ramdiskId")
+   addToList tItem, "productCodes", \
+         productCodesSet(pTree, pNode & "/productCodesSet")
    if pFormat is "array" then split tItem by cr and "="
    return tItem
 end DescribeImagesResponseItemType
@@ -1234,9 +1314,12 @@ end DescribeImagesResponseItemType
 private function xmlCreateKeyPair pXml
    put revCreateXmlTree(pXml, true, true, false) into tTree
    
-   put revXmlNodeContents(tTree, "CreateKeyPairResponse/keyName") into tArray["name"]
-   put revXmlNodeContents(tTree, "CreateKeyPairResponse/keyFingerprint") into tArray["fingerprint"]
-   put revXmlNodeContents(tTree, "CreateKeyPairResponse/keyMaterial") into tArray["material"]
+   put revXmlNodeContents(tTree, "CreateKeyPairResponse/keyName") into \
+         tArray["name"]
+   put revXmlNodeContents(tTree, "CreateKeyPairResponse/keyFingerprint") into \
+         tArray["fingerprint"]
+   put revXmlNodeContents(tTree, "CreateKeyPairResponse/keyMaterial") into \
+         tArray["material"]
    
    revDeleteXmlTree tTree
    return tArray
@@ -1264,8 +1347,10 @@ end xmlDescribeKeyPairs
 
 private function describeKeyPairsResponseItem pTree, pNode, pFormat
    put empty into tList
-   addToList tList, "keyName", revXmlNodeContents(pTree, pNode & "/keyName")
-   addToList tList, "keyFingerprint", revXmlNodeContents(pTree, pNode & "/keyFingerprint")
+   addToList tList, "keyName", \
+         revXmlNodeContents(pTree, pNode & "/keyName")
+   addToList tList, "keyFingerprint", \
+         revXmlNodeContents(pTree, pNode & "/keyFingerprint")
    
    if pFormat is "array" then split tList by cr and "="
    return tList
@@ -1289,10 +1374,10 @@ private function xmlDescribeVolumes pXml
    put "DescribeVolumesResponse/volumeSet" into tStartNode
    put revXmlFirstChild(tTree, tStartNode) into tNode
    repeat while tNode is not empty and "xmlerr" is not in tNode
-   
+      
       put revXmlNodeContents(tTree, tNode & "/volumeId") into tVol
       put xmlVolumeSetType(tTree, tNode) into tArray[tVol]
-       
+      
       put revXmlNextSibling(tTree, tNode) into tNode
    end repeat
    
@@ -1362,8 +1447,10 @@ private function xmlDescribeSnapshots pXml
          put revXmlNextSibling(tTree, tNode) into tNode
       end repeat
    else
-      put revXmlNodeContents(tTree, "DescribeSnapshotsResponse/snapshotId") into tSnap
-      put xmlAllNodeContents(tTree, "DescribeSnapshotsResponse") into tArray[tSnap]
+      put revXmlNodeContents(tTree, "DescribeSnapshotsResponse/snapshotId") \
+            into tSnap
+      put xmlAllNodeContents(tTree, "DescribeSnapshotsResponse") \
+            into tArray[tSnap]
    end if
    
    revDeleteXmlTree tTree
@@ -1391,7 +1478,7 @@ end xmlDescribeAddresses
 
 private function xmlDescribeSecurityGroups pXml
    put revCreateXmlTree(pXml, true, true, false) into tTree
-    
+   
    put "/DescribeSecurityGroupsResponse/securityGroupInfo" into tParent
    put revXmlFirstChild(tTree, tParent) into tNode
    repeat while tNode is not empty and "xmlerr" is not in tNode
@@ -1408,15 +1495,15 @@ end xmlDescribeSecurityGroups
 
 function xmlDescSGs pXml
    put revCreateXmlTree(pXml, true, true, false) into tTree
-    
+   
    put "/DescribeSecurityGroupsResponse/securityGroupInfo" into tParent
    put revXmlFirstChild(tTree, tParent) into tNode
    repeat while tNode is not empty and "xmlerr" is not in tNode
-   put revXmlNodeContents(tTree, tNode & "/groupName") into tName
+      put revXmlNodeContents(tTree, tNode & "/groupName") into tName
       put xmlAllNodeContents(tTree, tNode) into tArray[tName]
       
-       
-       
+      
+      
       -- put SecurityGroupItemType(tTree, tNode, "array") into tempArray
       -- put tempArray["groupName"] into tKey
       -- combine tempArray by cr and "="
@@ -1432,9 +1519,12 @@ end xmlDescSGs
 
 private function SecurityGroupItemType pTree, pNode, pFormat
    put empty into tList
-   addToList tList, "ownerId", revXmlNodeContents(pTree, pNode & "/ownerId")
-   addToList tList, "groupName", revXmlNodeContents(pTree, pNode & "/groupName")
-   addToList tList, "groupDescription", revXmlNodeContents(pTree, pNode & "/groupDescription")
+   addToList tList, "ownerId", \
+         revXmlNodeContents(pTree, pNode & "/ownerId")
+   addToList tList, "groupName", \
+         revXmlNodeContents(pTree, pNode & "/groupName")
+   addToList tList, "groupDescription", \
+         revXmlNodeContents(pTree, pNode & "/groupDescription")
    -- addToList tList, "ipPermissions", ipPermissionType(pTree, pNode & "/ipPermissions", "csv")
    get ipPermissionType(pTree, pNode & "/ipPermissions") 
    put it after tList
@@ -1452,16 +1542,20 @@ private function ipPermissionType pTree, pNode
    repeat while tNode is not empty and "xmlerr" is not in tNode
       add 1 to c
       put "ipPermissions." & c & "=" after tPermission
-      put revXmlNodeContents(pTree, tNode & "/ipProtocol") & comma after tPermission
-      put revXmlNodeContents(pTree, tNode & "/fromPort") & comma after tPermission
-      put revXmlNodeContents(pTree, tNode & "/toPort") & comma after tPermission
-      get securityGroupPairType(pTree, tNode & "/groups") if it is not empty then
+      put revXmlNodeContents(pTree, tNode & "/ipProtocol") & comma \
+            after tPermission
+      put revXmlNodeContents(pTree, tNode & "/fromPort") & comma \
+            after tPermission
+      put revXmlNodeContents(pTree, tNode & "/toPort") & comma \
+            after tPermission
+      get securityGroupPairType(pTree, tNode & "/groups")
+      if it is not empty then
          put it after tPermission
       else
          put ipRangesType(pTree, tNode & "/ipRanges") after tPermission
       end if
       put cr after tPermission
-       
+      
       -- addToList tList, "ipProtocol", revXmlNodeContents(pTree, tNode & "/ipProtocol")
       -- addToList tList, "fromPort", revXmlNodeContents(pTree, tNode & "/fromPort")
       -- addToList tList, "toPort", revXmlNodeContents(pTree, tNode & "/toPort")
@@ -1518,11 +1612,11 @@ private function xmlDescribeRegions pXml
 end xmlDescribeRegions
 
 -- private function regionItemType pTree, pNode
-   -- put empty into tItem
-   -- put revXmlNodeContents(pTree, pNode & "/regionName") into tArray["regionName"]
-   -- put revXmlNodeContents(pTree, pNode & "/regionUrl") into tArray["regionUrl"]
-   -- 
-   -- return tArray
+-- put empty into tItem
+-- put revXmlNodeContents(pTree, pNode & "/regionName") into tArray["regionName"]
+-- put revXmlNodeContents(pTree, pNode & "/regionUrl") into tArray["regionUrl"]
+-- 
+-- return tArray
 -- end regionItemType
 
 -----
@@ -1559,11 +1653,14 @@ private function xmlGetConsoleOutput pXml
    put revCreateXmlTree(pXml, true, true, false) into tTree
    
    put "/GetConsoleOutputResponse" into tNode
-    
-   put revXmlNodeContents(tTree, tNode & "/InstanceId") into tArray["instanceid"]
-   put revXmlNodeContents(tTree, tNode & "/timestamp") into tArray["timestamp"]
-   put base64decode(revXmlNodeContents(tTree, tNode & "/output")) into tArray["output"]
-    
+   
+   put revXmlNodeContents(tTree, tNode & "/InstanceId") \
+         into tArray["instanceid"]
+   put revXmlNodeContents(tTree, tNode & "/timestamp") \
+         into tArray["timestamp"]
+   put base64decode(revXmlNodeContents(tTree, tNode & "/output")) \
+         into tArray["output"]
+   
    revDeleteXmlTree tTree
    return tArray
 end xmlGetConsoleOutput
@@ -1571,7 +1668,8 @@ end xmlGetConsoleOutput
 -----
 
 private function xmlError pXml
-   return xmlSimpleResponse(pXml, "Code") & " : " & xmlSimpleResponse(pXml, "Message")
+   return xmlSimpleResponse(pXml, "Code") & " : " & \
+         xmlSimpleResponse(pXml, "Message")
 end xmlError
 
 
@@ -1591,7 +1689,8 @@ end xmlAllChildren
 -----
 
 private function xmlSimpleResponse pXML, pElementName
-   put offset("<" & pElementName & ">", pXml) + length(pElementName) + 2 into startChar
+   put offset("<" & pElementName & ">", pXml) + length(pElementName) + 2 \
+         into startChar
    put offset("</" & pElementName, pXml) - 1 into endChar
    return xmlEntities(char startChar to endChar of pXml)
 end xmlSimpleResponse
@@ -1611,8 +1710,8 @@ private function xmlAllNodeContents pTree, pNode
    put revXmlFirstChild(pTree, pNode) into tNode
    repeat until tNode is empty or "xmlerr" is in tNode
       --if revXmlNumberOfChildren(pTree, tNode, ,0) = 0 then
-         get revXmlNodeContents(pTree, tNode)
-         if it is not empty then put it into tArray[item -1 of tNode]
+      get revXmlNodeContents(pTree, tNode)
+      if it is not empty then put it into tArray[item -1 of tNode]
       --end if
       put revXmlNextSibling(pTree, tNode) into tNode
    end repeat
@@ -1633,7 +1732,8 @@ end xmlEntities
 -----
 
 private command addToList @pList, pLabel, pData
-   if pData is not empty and "xmlerr" is not in pData then put pLabel & "=" & pData & cr after pList
+   if pData is not empty and "xmlerr" is not in pData then \
+         put pLabel & "=" & pData & cr after pList
 end addToList
 
 -----
@@ -1644,8 +1744,8 @@ function xmlListMetrics pXml
    put "ListMetricsResponse/ListMetricsResult" into tStartNode
    put revXmlFirstChild(tTree, tStartNode) into tNode
    repeat while tNode is not empty and "xmlerr" is not in tNode
-       
-       
+      
+      
       put revXmlNextSibling(tTree, tNode) into tNode
    end repeat
    
@@ -1657,9 +1757,11 @@ end xmlListMetrics
 function xmlGetMetricStatistics pXml
    put revCreateXmlTree(pXml, true, true, false) into tTree
    put responseMetadata(tTree) into tArray["responsemetadata"]
-   put "GetMetricStatisticsResponse/GetMetricStatisticsResult/Label" into tLabelNode
+   put "GetMetricStatisticsResponse/GetMetricStatisticsResult/Label" \
+         into tLabelNode
    put revXmlNodeContents(tTree, tLabelNode) into tLabel
-   put "GetMetricStatisticsResponse/GetMetricStatisticsResult/DataPoints" into tStartNode
+   put "GetMetricStatisticsResponse/GetMetricStatisticsResult/DataPoints" \
+         into tStartNode
    
    put revXmlFirstChild(tTree, tStartNode) into tNode
    repeat while (tNode is not empty) and ("xmlerr" is not in tNode)
@@ -1667,7 +1769,7 @@ function xmlGetMetricStatistics pXml
       put nodeCont(tTree, tNode & "/Unit") into tArray[tTime]["unit"]
       put nodeCont(tTree, tNode & "/Samples") into tArray[tTime]["samples"]
       put nodeCont(tTree, tNode & "/Average") into tArray[tTime]["average"]
-       
+      
       put revXmlNextSibling(tTree, tNode) into tNode
    end repeat
    
@@ -1684,7 +1786,8 @@ end nodeCont
 
 private function responseMetadata pTree
    put revXmlRootNode(pTree) into tNode
-   put revXmlNodeContents(pTree, tNode & "/ResponseMetadata/RequestId") into tMetadata
+   put revXmlNodeContents(pTree, tNode & "/ResponseMetadata/RequestId") \
+         into tMetadata
    return tMetadata
 end responseMetadata
 
@@ -1705,8 +1808,9 @@ private function xmlMonitorInstancesSet pTree, pNode
    
    repeat while (tNode is not empty) and ("xmlerr" is not in tNode)
       put revXmlNodeContents(pTree, tNode & "/InstanceId") into tID
-      put revXmlNodeContents(pTree, tNode & "/monitoring/state") into tArray[tID]["monitoring"]
-       
+      put revXmlNodeContents(pTree, tNode & "/monitoring/state") \
+            into tArray[tID]["monitoring"]
+      
       put revXmlNextSibling(pTree, tNode) into tNode
    end repeat
    return tArray
@@ -1727,7 +1831,7 @@ function ec2xml.response pXml
    do ("put" && tAction & "(" & tTree & comma & tRoot & ") into tArray")
    
    if tArray["status"] is not "error" then put "ok" into tArray["status"]
-    
+   
    revDeleteXmlTree tTree
    return tArray
 end ec2xml.response
@@ -1747,7 +1851,7 @@ private function xmlDescribeAddressesResponse pTree, pRoot
       put revXmlNextSibling(pTree, tNode) into tNode
    end repeat
 end xmlDescribeAddressesResponse
- 
+
 -----
 
 private function xmlAllocateAddressResponse pTree, pRoot
@@ -1785,5 +1889,5 @@ private function xmlReleaseAddressResponse pTree, pRoot
    return tArray
 end xmlReleaseAddressResponse
 
-=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=---
----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=
+---===---===---===---===---===---===---===---===---===---===---===---===---===---
+---===---===---===---===---===---===---===---===---===---===---===---===---===---

@@ -58,7 +58,7 @@ function sdb.domainExists pDomain
    if "error:" is not in tDomains then
       return pDomain is among the lines of tDomains
    else
-       return tDomains
+      return tDomains
    end if
 end sdb.domainExists
 
@@ -221,7 +221,7 @@ function sdb.select.curl pSelectExpression, pNextToken
    put pSelectExpression into tQarray["SelectExpression"]
    if pNextToken is not empty then put pNextToken into tQarray["NextToken"]
    
-  return sdb.curl(tQarray)
+   return sdb.curl(tQarray)
 end sdb.select.curl
 
 -----
@@ -255,7 +255,7 @@ on sdb.multiGet pDomain, pItemList, pAttributes, pMaxCurls
    put the number of lines in pItemList into sMultiGet["numitems"]
    put 0 into sMultiGet["numdone"]
    put pMaxCurls into sMultiGet["maxcurls"]
-    
+   
    send  "doSdbMultiGet" to me in 2 millisecs
 end sdb.multiGet
 
@@ -290,7 +290,7 @@ on processSdbMultiQueue
          send "processSdbMultiQueue" to me in 50 millisecs
       end if
    else
-       put "done" into sMultiGet["status"]
+      put "done" into sMultiGet["status"]
    end if
 end processSdbMultiQueue
 
@@ -313,7 +313,7 @@ end sdb.MultiGetStatus
 function sdb.MultiGet.done
    return sMultiGet["status"] is in "done,cancelled,error"
 end sdb.MultiGet.done
- 
+
 -=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=----=---
 --> sdb internals
 ------------------------
@@ -349,7 +349,7 @@ private function sdb.send p1, pFormat
    else -- no xml!
       return tResponse
    end if
-    
+   
    if pFormat is "xml" then return tResponse
    
    put sdbXml(tResponse) into tArray
@@ -359,7 +359,7 @@ private function sdb.send p1, pFormat
       return tArray["data"]
    end if
 end sdb.send
- 
+
 -----
 
 function sendLU p1, pFormat
@@ -370,14 +370,14 @@ function sendLU p1, pFormat
    libUrlSetSSLVerification false
    post tPostData to url tUrl
    put it into tResponse
-    
+   
    get offset("<?xml", tResponse)
    if it > 0 then
       delete char 1 to it - 1 of tResponse
    else -- no xml!
       return tResponse
    end if
-    
+   
    if pFormat is "xml" then return tResponse
    
    put sdbXml(tResponse) into tArray
@@ -401,12 +401,12 @@ private function sdb.curl pQarray
       end if
    end repeat
    if curl = 0 then return 0
-    
+   
    curl.setUrl tCurl, "https://" & sdbGetEndPoint()
    curl.setPostData tCurl, tPostData
    curl.setMethod tCurl, "POST"
    curl.setHeaders tCurl, "Content-Type: application/x-www-form-urlencoded; charset=utf-8"
-    
+   
    return tCurl
 end sdb.curl
 
@@ -468,7 +468,7 @@ private function sdb.type2Auth pQarray
    delete char -1 of tStringToSign
    -- put tStringToSign
    -- exit to top
-    
+   
    put hmacSha256.b64(tStringToSign, getAwsSecretkey()) into tAuthstring
    return tAuthstring
 end sdb.type2Auth
@@ -498,7 +498,7 @@ private function putAttributeList pAttributes, pReplace
          end repeat
       end if
    end repeat
-    
+   
    return tAttributeArray
 end putAttributeList
 
@@ -513,7 +513,7 @@ private function batchPutAttributeList pAttributeData, pReplace
    repeat for each key tItem in pAttributeData
       add the number of lines in keys(pAttributeData[tItem] to numAttributes
       if numAttributes > 256 then return "error:too many attributes (max: 256)"
-       
+      
       put 0 into tAttributeCount
       put tItem into tQarray["Item." & tItemCount & ".ItemName"]
       
@@ -536,7 +536,7 @@ private function batchPutAttributeList pAttributeData, pReplace
    
    return tQarray
 end batchPutAttributeList
-   
+
 
 -----
 
@@ -556,7 +556,7 @@ end getAttributeList
 private function deleteAttributeList pAttributes
    if pAttributes is not an array and pAttributes is empty then return empty
    if pAttributes is not an array then split pAttributes by cr and "="
-    
+   
    repeat for each key k in pAttributes
       if pAttributes[k] is empty then
          add 1 to c
@@ -575,19 +575,19 @@ end deleteAttributeList
 -----
 
 private function q pStr
-  return quote & pStr & quote
+   return quote & pStr & quote
 end q
 
 -----
 
 private function sq pStr
-    return "'" & pStr & "'"
+   return "'" & pStr & "'"
 end sq
 
 -----
 
 private function bq pStr
-    return "`" & pStr & "`"
+   return "`" & pStr & "`"
 end bq
 
 -----
@@ -617,11 +617,11 @@ private function sdbXml pXml
    else
       put responseMetadata(tTree) into tArray["responseMetadata"]
       put "ok" into tArray["status"]
-       
-       
+      
+      
       get getNextToken(tTree)
       if it is not empty then put it into tArray["nexttoken"]
-       
+      
       if (tArray["status"] is "ok") then
          put revXmlRootNode(tTree) into tRoot
          put item -1 of revXmlFirstChild(tTree, tRoot) into tAction
@@ -634,7 +634,7 @@ private function sdbXml pXml
             end try
          end if
       end if
-       
+      
    end if
    revDeleteXmlTree tTree
    return tArray
@@ -661,7 +661,7 @@ private function ListDomainsResult pTree
       put revXmlNextSibling(pTree, tNode) into tNode
    end repeat
    delete char -1 of tDomainList
-    
+   
    return tDomainList
 end ListDomainsResult
 
@@ -675,7 +675,7 @@ private function DomainMetadataResult pTree
       put nodeCont(pTree, tNode) into tArray[item -1 of tNode]
       put revXmlNextSibling(pTree, tNode) into tNode
    end repeat
-    
+   
    return tArray
 end DomainMetadataResult
 
@@ -687,10 +687,10 @@ private function GetAttributesResult pTree
       put attributeElement(pTree, tNode & "/Name") into tName
       add 1 to tAttrCount[tName]
       put attributeElement(pTree, tNode & "/Value") into tArray[tName][tAttrCount[tName]]
-       
+      
       put revXmlNextSibling(pTree, tNode) into tNode
    end repeat
-    
+   
    ### unfold single valued attributes
    repeat for each key k in tAttrCount
       if tAttrCount[k] = 1 then put tArray[k][1] into tArray[k]
@@ -706,12 +706,12 @@ private function selectResult pTree
    put "SelectResponse/SelectResult" into tNode
    
    put revXmlFirstChild(pTree, tNode) into tItemNode
-    
+   
    repeat until (tItemNode is empty) or ("xmlerr" is in tItemNode)
       if "/Item" is in tItemNode then
          -- get the name of the item
          put attributeElement(pTree, tItemNode & "/Name") into tName
-          
+         
          put xmlSelectItemAttributes(pTree, tItemNode) into tArray[tName]
       end if
       put revXmlNextSibling(pTree, tItemNode) into tItemNode
@@ -818,7 +818,7 @@ private function xmlListDomains pXml
    if tArray["status"] is "ok" then
       put tArray["treeID"] into tTree
       delete variable tArray["treeID"]
-       
+      
       put revXmlFirstChild(tTree, "ListDomainsResponse/ListDomainsResult") into tNode
       repeat until tNode is empty or "xmlerr" is in tNode
          put utf8decode(revXmlNodeContents(tTree, tNode)) & cr after tArray["domainlist"]
@@ -849,7 +849,7 @@ private function xmlDomainMetadata pXml
          put round(revXmlNodeContents(tTree, tNode)) into tArray["domainMetaData"][item -1 of tNode]
          put revXmlNextSibling(tTree, tNode) into tNode
       end repeat
-       
+      
       revDeleteXmlTree tTree
    end if
    return tArray
@@ -894,7 +894,7 @@ private function xmlSelect pXml, pOutputType
    if tArray["status"] is "ok" then
       put tArray["treeID"] into tTree
       delete variable tArray["treeID"]
-       
+      
       put "SelectResponse/SelectResult" into tNode
       
       if "<NextToken" is in pXml then
@@ -902,7 +902,7 @@ private function xmlSelect pXml, pOutputType
          replace crlf with empty in tArray["NextToken"]
          replace cr with empty in tArray["NextToken"]
       end if
-       
+      
       if "<Item" is in pXml then
          put revXmlFirstChild(tTree, tNode) into tItemNode
          
@@ -924,10 +924,10 @@ private function xmlSelect pXml, pOutputType
          end if
       end if
       
-       
+      
       revDeleteXmlTree tTree
    end if
-    
+   
    return tArray
 end xmlSelect
 

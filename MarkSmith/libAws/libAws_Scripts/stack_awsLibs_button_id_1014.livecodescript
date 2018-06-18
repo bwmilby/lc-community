@@ -32,7 +32,7 @@ function sqs.createQueue pQname, pQlocation, pFormat
    
    put sqs.curl(tQarray, pQlocation) into tCurl
    put curl.runTilDone(tCurl) into tResponse
-  
+   
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return linerize(tResponse)
    
@@ -75,7 +75,7 @@ function sqs.deleteQueue pQurl, pFormat
    
    put sqs.curl(tQarray, pQurl) into tCurl
    put curl.runTilDone(tCurl) into tResponse
-    
+   
    if "curl" is in word 1 of tResponse then return "error:" && tResponse
    if pFormat is "xml" then return linerize(tResponse)
    
@@ -143,7 +143,8 @@ other than ascii up to numtochar(127)
 
 function sqs.sendMessage pQurl, pMessage, pFormat
    get length(pMessage)
-   if it < 1 or it > 8192 then return "error: message must be from 1 to 8192 bytes"
+   if it < 1 or it > 8192 then \
+         return "error: message must be from 1 to 8192 bytes"
    
    put "SendMessage" into tQarray["Action"]
    put pMessage into tQarray["MessageBody"]
@@ -155,8 +156,9 @@ function sqs.sendMessage pQurl, pMessage, pFormat
    if pFormat is "xml" then return linerize(tResponse)
    
    put xmlSendMessage(tResponse) into tArray
-   if tArray["md5ofmessage"] is not md5.hex(pMessage) then put "md5 mismatch" into tArray["error"]
-    
+   if tArray["md5ofmessage"] is not md5.hex(pMessage) then \
+         put "md5 mismatch" into tArray["error"]
+   
    if pFormat is not "array" then
       combine tArray by cr and "="
       sort lines of tArray
@@ -170,10 +172,12 @@ function sqs.receiveMessage pQurl, pNumMessages, pVisibilityTimeout, pFormat
    put "ReceiveMessage" into tQarray["Action"]
    
    get pNumMessages
-   if it is an integer and it >= 1 and it <= 10 then put it into tQarray["MaxNumberOfMessages"]
+   if it is an integer and it >= 1 and it <= 10 then \
+         put it into tQarray["MaxNumberOfMessages"]
    
    get pVisibilityTimeout
-   if it is an integer and it >=0 and it <= 7200 then put it into tQarray["VisibilityTimeout"]
+   if it is an integer and it >=0 and it <= 7200 then \
+         put it into tQarray["VisibilityTimeout"]
    
    put sqs.curl(tQarray, pQurl) into tCurl
    put curl.runTilDone(tCurl) into tResponse
@@ -240,14 +244,14 @@ end sqs.popMessage
 -----
 
 function sqs.addPermission pQurl, pLabel, pPermissions
-  
+   
 end sqs.addPermission
 
 function sqs.removePermission pQurl, pLabel
    
 end sqs.removePermission
 
----==---==---==---==---==---==---==---==---==---==---==---==---==---==---==---==---==---==---==---==---
+---===---===---===---===---===---===---===---===---===---===---===---===---===---
 --> internals
 ------------------
 
@@ -291,14 +295,15 @@ private function sqs.makePostData pQarray, pQurl
    put "2" into pQarray["SignatureVersion"]
    put "HmacSHA256" into pQarray["SignatureMethod"]
    put sqs.type2Auth(pQarray, pQurl) into pQarray["Signature"]
-    
+   
    put the keys of pQarray into tKeys
    sort lines of tKeys
    repeat for each line L in tKeys
-      if pQarray[L] is not empty then put  L & "=" & urlencode(pQarray[L]) & "&" after tQueryString
+      if pQarray[L] is not empty then \
+            put L & "=" & urlencode(pQarray[L]) & "&" after tQueryString
    end repeat
    delete char -1 of tQueryString
-    
+   
    return tQueryString
 end sqs.makePostData
 
@@ -318,7 +323,7 @@ end sqs.type1Auth
 -----
 
 private function sqs.type2Auth pQarray, pQurl
-  
+   
    replace "http://queue.amazonaws.com" with empty in pQurl
    put "POST" & cr & "queue.amazonaws.com" & cr & pQurl & cr into tStringToSign
    
@@ -340,7 +345,7 @@ private function sqs.makePermissions pLabel, pPermissions
    
 end sqs.makePermissions
 
----==---==---==---==---==---==---==---==---==---==---==---==---==---==---==---==---==---==---==---==---
+---===---===---===---===---===---===---===---===---===---===---===---===---===---
 --> xml responses
 --------------------------
 
@@ -464,8 +469,10 @@ private function xmlSendMessage pXml
       return tTree
    else
       put "SendMessageResponse/SendMessageResult" into tNode
-      put revXmlNodeContents(tTree, tNode & "/MessageId") into tArray["messageid"]
-      put revXmlNodeContents(tTree, tNode & "/MD5OfMessageBody") into tArray["md5ofmessage"]
+      put revXmlNodeContents(tTree, tNode & "/MessageId") \
+            into tArray["messageid"]
+      put revXmlNodeContents(tTree, tNode & "/MD5OfMessageBody") \
+            into tArray["md5ofmessage"]
       put "ok" into tArray["status"]
    end if
    revDeleteXmlTree tTree
@@ -508,11 +515,16 @@ end xmlMessageList
 -----
 
 private function xmlMessage pTree, pNode, pMessageNum
-   put revXmlNodeContents(pTree, pNode & "/MessageId") into tArray["messageid", pMessageNum]
-   put revXmlNodeContents(pTree, pNode & "/ReceiptHandle") into tArray["receipthandle", pMessageNum]
-   put revXmlNodeContents(pTree, pNode & "/MD5OfBody") into tArray["md5ofbody", pMessageNum]
-   put revXmlNodeContents(pTree, pNode & "/Body") into tArray["body", pMessageNum]
-   if tArray["md5ofbody",pMessageNum] <> md5.hex(tArray["body", pMessageNum]) then put "md5 mismatch" into tArray["error", pMessageNum]
+   put revXmlNodeContents(pTree, pNode & "/MessageId") \
+         into tArray["messageid", pMessageNum]
+   put revXmlNodeContents(pTree, pNode & "/ReceiptHandle") \
+         into tArray["receipthandle", pMessageNum]
+   put revXmlNodeContents(pTree, pNode & "/MD5OfBody") \
+         into tArray["md5ofbody", pMessageNum]
+   put revXmlNodeContents(pTree, pNode & "/Body") \
+         into tArray["body", pMessageNum]
+   if tArray["md5ofbody",pMessageNum] <> md5.hex(tArray["body", pMessageNum]) \
+         then put "md5 mismatch" into tArray["error", pMessageNum]
    return tArray
 end xmlMessage
 
@@ -532,10 +544,14 @@ end xmlDeleteMessage
 -----
 
 private function sqs.xmlErrorResponse pTree
-   put revXmlNodeContents(pTree, "ErrorResponse/Error/Type") into tArray["type"]
-   put revXmlNodeContents(pTree, "ErrorResponse/Error/Code") into tArray["code"]
-   put revXmlNodeContents(pTree, "ErrorResponse/Error/Message") into tArray["message"]
-   put revXmlNodeContents(pTree, "ErrorResponse/RequestID") into tArray["requestid"]
+   put revXmlNodeContents(pTree, "ErrorResponse/Error/Type") \
+         into tArray["type"]
+   put revXmlNodeContents(pTree, "ErrorResponse/Error/Code") \
+         into tArray["code"]
+   put revXmlNodeContents(pTree, "ErrorResponse/Error/Message") \
+         into tArray["message"]
+   put revXmlNodeContents(pTree, "ErrorResponse/RequestID") \
+         into tArray["requestid"]
    return tArray
 end sqs.xmlErrorResponse
 

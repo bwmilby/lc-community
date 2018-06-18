@@ -9,5 +9,5 @@ Script "stack_awsLibs_button_id_1010"
 --> all handlers
 
 on mouseUp
-  start using this stack
+   start using this stack
 end mouseUp

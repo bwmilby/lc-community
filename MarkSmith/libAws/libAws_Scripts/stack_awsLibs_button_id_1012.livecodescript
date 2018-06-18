@@ -105,7 +105,7 @@ end fileMd5.all
 function m58 pString
    put md5.hex(pString) into tHash
    repeat with n = 1 to 28 step 4
-       put byte n of tHash after tM5
+      put byte n of tHash after tM5
    end repeat
    return tM5
 end m58
@@ -201,21 +201,21 @@ end sha224.b64
 --> hmac
 
 private function hmacMd5 pMsg, pKey
-  if length(pKey) > 64 then put md5digest(pKey) into pKey
-  repeat 64 - length(pKey)
-    put null after pKey
-  end repeat
-  
-  repeat for each byte c in pKey
-    put numtobyte(bytetonum(c) bitXor 54) after ipad
-    put numtobyte(bytetonum(c) bitXor 92) after opad
-  end repeat
-  
-  return md5digest(opad & md5digest(ipad & pMsg))
+   if length(pKey) > 64 then put md5digest(pKey) into pKey
+   repeat 64 - length(pKey)
+      put null after pKey
+   end repeat
+   
+   repeat for each byte c in pKey
+      put numtobyte(bytetonum(c) bitXor 54) after ipad
+      put numtobyte(bytetonum(c) bitXor 92) after opad
+   end repeat
+   
+   return md5digest(opad & md5digest(ipad & pMsg))
 end hmacMd5
 
 function hmacMd5.hex pMsg, pKey
-  return binToHex(hmacMd5(pMsg, pKey))
+   return binToHex(hmacMd5(pMsg, pKey))
 end hmacMd5.hex
 
 function hmacMd5.b64 pMsg, pKey
@@ -223,59 +223,59 @@ function hmacMd5.b64 pMsg, pKey
 end hmacMd5.b64
 
 function hmacMd5.bin pMsg, pKey
-  return hmacMd5(pMsg, pKey)
+   return hmacMd5(pMsg, pKey)
 end hmacMd5.bin
 
 ------------------------------------------------
 
 private function hmacSha1 pMsg, pKey
-  if length(pKey) > 64 then put sha1(pKey) into pKey
-  repeat 64 - length(pKey)
-    put null after pKey
-  end repeat
-  
-  repeat for each byte c in pKey
-    put numtobyte(bytetonum(c) bitXor 54) after ipad
-    put numtobyte(bytetonum(c) bitXor 92) after opad
-  end repeat
-  
-  return sha1(opad & sha1(ipad & pMsg))
+   if length(pKey) > 64 then put sha1(pKey) into pKey
+   repeat 64 - length(pKey)
+      put null after pKey
+   end repeat
+   
+   repeat for each byte c in pKey
+      put numtobyte(bytetonum(c) bitXor 54) after ipad
+      put numtobyte(bytetonum(c) bitXor 92) after opad
+   end repeat
+   
+   return sha1(opad & sha1(ipad & pMsg))
 end hmacSha1
 
 function hmacSha1.hex pMsg, pKey
-  return binToHex(hmacSha1(pMsg, pKey))
+   return binToHex(hmacSha1(pMsg, pKey))
 end hmacSha1.hex
 
 function hmacSha1.b64 pMsg, pKey
-  return base64encode(hmacSha1(pMsg, pKey))
+   return base64encode(hmacSha1(pMsg, pKey))
 end hmacSha1.b64
 
 function hmacSha1.bin pMsg, pKey
-  return hmacSha1(pMsg, pKey)
+   return hmacSha1(pMsg, pKey)
 end hmacSha1.bin
 
 ------------------------------------------------
 
 private function hmacSha2 pMsg, pKey, pNumBits
-  if length(pKey) > 64 then put sha2(pKey,,pNumBits) into pKey
-  repeat 64 - length(pKey)
-    put null after pKey
-  end repeat
-  
-  repeat for each byte b in pKey
-    put numtobyte(bytetonum(b) bitXor 54) after ipad
-    put numtobyte(bytetonum(b) bitXor 92) after opad
-  end repeat
-  
-  return sha2(opad & sha2(ipad & pMsg,,pNumBits),,pNumBits)
+   if length(pKey) > 64 then put sha2(pKey,,pNumBits) into pKey
+   repeat 64 - length(pKey)
+      put null after pKey
+   end repeat
+   
+   repeat for each byte b in pKey
+      put numtobyte(bytetonum(b) bitXor 54) after ipad
+      put numtobyte(bytetonum(b) bitXor 92) after opad
+   end repeat
+   
+   return sha2(opad & sha2(ipad & pMsg,,pNumBits),,pNumBits)
 end hmacSha2
 
 function hmacSha256.hex pMsg, pKey
-  return binToHex(hmacSha2(pMsg, pKey, 256))
+   return binToHex(hmacSha2(pMsg, pKey, 256))
 end hmacSha256.hex
 
 function hmacSha256.b64 pMsg, pKey
-  return base64encode(hmacSha2(pMsg, pKey, 256))
+   return base64encode(hmacSha2(pMsg, pKey, 256))
 end hmacSha256.b64
 
 function hmacSha256.bin pMsg, pKey
@@ -283,15 +283,15 @@ function hmacSha256.bin pMsg, pKey
 end hmacSha256.bin
 
 function hmacSha224.hex pMsg, pKey
-  return binToHex(hmacSha2(pMsg, pKey, 224))
+   return binToHex(hmacSha2(pMsg, pKey, 224))
 end hmacSha224.hex
 
 function hmacSha224.b64 pMsg, pKey
-  return base64encode(hmacSha2(pMsg, pKey, 224))
+   return base64encode(hmacSha2(pMsg, pKey, 224))
 end hmacSha224.b64
 
 function hmacSha224.bin pMsg, pKey
-  return hmacSha2(pMsg, pKey, 224)
+   return hmacSha2(pMsg, pKey, 224)
 end hmacSha224.bin
 
 
@@ -350,7 +350,7 @@ private function sha2 pInput, pIsFile, pNumBits
    end repeat
    
    if pNumBits = 224 then
-       return binaryencode("M7", h0,h1,h2,h3,h4,h5,h6)
+      return binaryencode("M7", h0,h1,h2,h3,h4,h5,h6)
    else
       return binaryencode("M8", h0,h1,h2,h3,h4,h5,h6,h7)
    end if
@@ -397,16 +397,20 @@ end initSha1vars
 
 private command initSha256consts
    if keys(k) is empty then
-      put "1116352408,1899447441,3049323471,3921009573,961987163,1508970993,2453635748," & \
-            "2870763221,3624381080,310598401,607225278,1426881987,1925078388,2162078206," & \
-            "2614888103,3248222580,3835390401,4022224774,264347078,604807628,770255983," & \
-            "1249150122,1555081692,1996064986,2554220882,2821834349,2952996808,3210313671," & \
-            "3336571891,3584528711,113926993,338241895,666307205,773529912,1294757372,1396182291," & \
-            "1695183700,1986661051,2177026350,2456956037,2730485921,2820302411,3259730800,3345764771," & \
-            "3516065817,3600352804,4094571909,275423344,430227734,506948616,659060556,883997877," & \
-            "958139571,1322822218,1537002063,1747873779,1955562222,2024104815,2227730452," & \
-            "2361852424,2428436474,2756734187,3204031479,3329325298" into tConsts
-       
+      put "1116352408,1899447441,3049323471,3921009573,961987163,1508970993," & \ 
+            "2453635748,2870763221,3624381080,310598401,607225278," & \
+            "1426881987,1925078388,2162078206,2614888103,3248222580," & \
+            "3835390401,4022224774,264347078,604807628,770255983," & \
+            "1249150122,1555081692,1996064986,2554220882,2821834349," & \
+            "2952996808,3210313671,3336571891,3584528711,113926993," & \
+            "338241895,666307205,773529912,1294757372,1396182291," & \
+            "1695183700,1986661051,2177026350,2456956037,2730485921," & \
+            "2820302411,3259730800,3345764771,3516065817,3600352804," & \
+            "4094571909,275423344,430227734,506948616,659060556,883997877," & \
+            "958139571,1322822218,1537002063,1747873779,1955562222," & \
+            "2024104815,2227730452,2361852424,2428436474,2756734187," & \
+            "3204031479,3329325298" into tConsts
+      
       put 0 into count
       repeat for each item i in tConsts
          put i into k[count]
@@ -613,7 +617,7 @@ private command processChunkSha1 pChunk
    repeat with n = 16 to 79
       put (w[n-3] bitXor w[n-8] bitXor w[n-14] bitXor w[n-16]) * 2 into tNum
       --put rotl(tNum, 1) into w[n]
-       
+      
       -- rotateLeft
       if tNum > 4294967295 then
          put tNum mod 4294967295 into r1
@@ -633,9 +637,9 @@ private command processChunkSha1 pChunk
    put h2 into c
    put h3 into d
    put h4 into e
-    
+   
    repeat with n = 0 to 79
-       
+      
       if n < 20 then
          put (b bitAnd c) bitOr ((bitNot b) bitAnd d) into f
          put 1518500249 into k
@@ -682,9 +686,9 @@ private command processChunkSha1 pChunk
       
       put a into b
       put tTemp into a
-       
+      
    end repeat
-    
+   
    put (h0 + a) mod 4294967296 into h0
    put (h1 + b) mod 4294967296 into h1
    put (h2 + c) mod 4294967296 into h2
@@ -765,14 +769,14 @@ private function nextChunk
    put empty into tChunk
    
    if (sBytesDone < sDataSize) and (sDataSize > 0) then
-       
+      
       if sIsFile then
          read from file sSource for 64
          put it into tChunk
       else
          put byte (sBytesDone + 1) to (sBytesDone + 64) of sSource into tChunk
       end if
-       
+      
       put length(tChunk) into tChunkSize
       add tChunkSize to sBytesDone
       
@@ -785,7 +789,7 @@ private function nextChunk
       else if tChunksize > 55 and tChunkSize < 64 then
          put sTail["p"] after tChunk
       end if
-       
+      
    else
       if sTail["u"] is not empty then
          put sTail["u"] into tChunk
@@ -793,7 +797,7 @@ private function nextChunk
          if sIsFile then close file sSource
       end if
    end if
-    
+   
    return tChunk
 end nextChunk
 
@@ -830,7 +834,7 @@ end htpasswd.sha1.salted
 function verify.htpasswd.sha1 pPword, pStoredPword
    if pStoredPword begins with "{ SHA} " then
       return htpasswd.sha1(pPword) = pStoredPword
-       
+      
    else if pStoredPword begins with "{ SSHA} " then
       put base64decode(byte 8 to -1 of pStoredPword) into tBinStr
       put byte -2 to -1 of tBinStr into tSalt
@@ -978,27 +982,29 @@ function cs2decrypt pData, pKey, pEncoding, pIterations
          put hexToBin(pData) into pData
          break
    end switch
-   put rc4(char 11 to -1 of pData, pKey & char 1 to 10 of pData, pIterations) into tUnenc
+   put rc4(char 11 to -1 of pData, pKey & char 1 to 10 of pData, pIterations) \
+         into tUnenc
    return tUnenc
 end cs2decrypt
 
 -----
 
 function rc4 pData, pKey, pIterations
-   if not (pIterations is an integer and pIterations > 0) then put 1 into pIterations
+   if not (pIterations is an integer and pIterations > 0) then \
+         put 1 into pIterations
    
    -- initialize
    repeat with i = 0 to 255
       put i into S1[i]
    end repeat
-    
+   
    put 0 into i
    repeat with n = 0 to 255
       add 1 to i
       if i > length(pkey) then put 1 into i
       put bytetonum(char i of pKey) into S2[n]
    end repeat
-    
+   
    put 0 into j
    repeat pIterations
       repeat with i = 0 to 255
@@ -1008,12 +1014,12 @@ function rc4 pData, pKey, pIterations
          put temp into S1[j]
       end repeat
    end repeat
-    
+   
    -- encrypt/decrypt
    put 0 into i ; put 0 into j
    repeat for each byte c in pData
       put bytetonum(c) into tChar
-       
+      
       put (i + 1) mod 256 into i
       put (j + S1[i]) mod 256 into j
       put S1[i] into temp
@@ -1021,18 +1027,20 @@ function rc4 pData, pKey, pIterations
       put temp into S1[j]
       put (S1[i] + S1[j]) mod 256 into t
       put S1[t] into K
-       
+      
       put numtobyte(tChar bitXor K) after tOutput
    end repeat
-    
+   
    return tOutput
 end rc4
 
 function rc4bytes pNumBytes
-   put the millisecs & the seconds & the long date & the platform & the version into tKey
-   put the long seconds & $USER & the systemversion & the long id of me after tKey
+   put the millisecs & the seconds & the long date & the platform & the version \
+         into tKey
+   put the long seconds & $USER & the systemversion & the long id of me \
+         after tKey
    put the environment & the millisecs after tKey
-    
+   
    put random(1000) into tData
    set the itemdelimiter to "."
    repeat until length(tData) >= pNumBytes
@@ -1075,16 +1083,16 @@ end shtl
 
 # rotate right
 -- function rotr pNum, pSteps
-   -- if pNum = 0 then return 0
-   -- if pSteps is empty then put 1 into pSteps
-   -- 
-   -- repeat pSteps
-      -- put (pNum mod 2 <> 0) into isOdd
-      -- put pNum div 2 into pNum
-      -- if isOdd then add 2147483648 to pNum
-   -- end repeat
-   -- 
-   -- return pNum
+-- if pNum = 0 then return 0
+-- if pSteps is empty then put 1 into pSteps
+-- 
+-- repeat pSteps
+-- put (pNum mod 2 <> 0) into isOdd
+-- put pNum div 2 into pNum
+-- if isOdd then add 2147483648 to pNum
+-- end repeat
+-- 
+-- return pNum
 -- end rotr
 
 
@@ -1100,20 +1108,20 @@ end rotr
 
 # rotate left
 private function rotl pNum, pSteps
-  if pNum = 0 then return 0
-  if pSteps is empty then put 1 into pSteps
+   if pNum = 0 then return 0
+   if pSteps is empty then put 1 into pSteps
    
-  put pNum * (2 ^ pSteps) into tNum
-  
-  if tNum > 4294967295 then
-    put tNum mod 4294967295 into r1
-    if r1 = 0 then 
-      put 4294967295 into r1
-    end if
-  else
-    put tNum into r1
-  end if
-  return r1
+   put pNum * (2 ^ pSteps) into tNum
+   
+   if tNum > 4294967295 then
+      put tNum mod 4294967295 into r1
+      if r1 = 0 then 
+         put 4294967295 into r1
+      end if
+   else
+      put tNum into r1
+   end if
+   return r1
 end rotl
 
 -----
@@ -1128,7 +1136,7 @@ private function getFileSize pFileName
    put the directory into tOldFolder
    set the directory to tFolderName
    put urldecode(the detailed files) into tFileList
-    
+   
    get lineoffset(tFileName,tFileList)
    put line it of tFileList into tInfo
    return item 2 of tInfo
@@ -1151,19 +1159,19 @@ end uuidgen
 ------------------------
 
 function newUid pNoDashes
-  put randomHexChars(15) into tTimeStamp
-  put bitsToHex("10" & randomBits(14)) into tClockSeq
-  put randomHexChars(12) into tNode
+   put randomHexChars(15) into tTimeStamp
+   put bitsToHex("10" & randomBits(14)) into tClockSeq
+   put randomHexChars(12) into tNode
    
-  put char 8 to 15 of tTimeStamp & "-" into tUUID
-  put char 4 to 7 of tTimeStamp & "-" after tUUID
-  put "4" & char 1 to 3 of tTimeStamp & "-" after tUUID 
-  put tClockSeq & "-" after tUUID
-  put tNode after tUUID
-  
-  if pNoDashes then replace "-" with empty in tUUID
-  
-  return tolower(tUUID)
+   put char 8 to 15 of tTimeStamp & "-" into tUUID
+   put char 4 to 7 of tTimeStamp & "-" after tUUID
+   put "4" & char 1 to 3 of tTimeStamp & "-" after tUUID 
+   put tClockSeq & "-" after tUUID
+   put tNode after tUUID
+   
+   if pNoDashes then replace "-" with empty in tUUID
+   
+   return tolower(tUUID)
 end newUid
 
 private function randomHexChars pHowMany
@@ -1196,32 +1204,32 @@ author: Mark Smith
 -----
 
 on setEndian
-  put (char 1 of (binaryencode("I",1)) is null) into sBigEndian
+   put (char 1 of (binaryencode("I",1)) is null) into sBigEndian
 end setEndian
 
 -----
 
 function getEndianness
-  if sBigEndian then
-    return "big"
-  else
-    return "little"
-  end if
+   if sBigEndian then
+      return "big"
+   else
+      return "little"
+   end if
 end getEndianness
 
 -----
 
 function lbcVersion
-  return "1.1"
+   return "1.1"
 end lbcVersion
 
 -----
 
 function reverseBytes pBytes
-  repeat for each char c in pBytes
-    put c before nBytes
-  end repeat
-  return nBytes
+   repeat for each char c in pBytes
+      put c before nBytes
+   end repeat
+   return nBytes
 end reverseBytes
 
 -----
@@ -1236,23 +1244,23 @@ end swapBytes
 -----
 
 function binToHex pString
-  repeat for each char c in pString
-    get chartonum(c)
-    put baseconvert(it,10,16) into tTemp
-    if it < 16 then put "0" before tTemp
-    put tTemp after tHex
-  end repeat
-  return tolower(tHex)
+   repeat for each char c in pString
+      get chartonum(c)
+      put baseconvert(it,10,16) into tTemp
+      if it < 16 then put "0" before tTemp
+      put tTemp after tHex
+   end repeat
+   return tolower(tHex)
 end binToHex
 
 ----
 
 function binToBits pString
-  repeat for each char c in pString
-    put format("%08s",baseConvert(chartonum(c),10,2)) into tTemp
-    put tTemp after tBits
-  end repeat
-  return tBits
+   repeat for each char c in pString
+      put format("%08s",baseConvert(chartonum(c),10,2)) into tTemp
+      put tTemp after tBits
+   end repeat
+   return tBits
 end binToBits
 
 ----
@@ -1260,7 +1268,7 @@ end binToBits
 function bitsToBin pBits
    repeat with n = 1 to length(pBits) - 8 step 8
       put char n to n + 7 of pBits into tNum
-       
+      
       put numtochar(baseconvert(tNum,2,10)) after tBin
    end repeat
    return tBin
@@ -1269,48 +1277,48 @@ end bitsToBin
 ----
 
 function decToBits pNum, pNumBits
-  if pNumBits is empty then put 32 into pNumBits
-  if pNum < 0 then put (2 ^ pNumBits - 1) + pNum into pNum
-  if pNum < 2 ^ pNumBits then 
-    put baseconvert(pNum,10,2) into tBits
-  else
-    repeat while pNum >= 1
-      if pNum mod 2 = 0 then
-        put 0 before tBits
-      else
-        put 1 before tBits
-        subtract 1 from pNum
-      end if
-      put (pNum / 2) into pNum
-    end repeat
-  end if
+   if pNumBits is empty then put 32 into pNumBits
+   if pNum < 0 then put (2 ^ pNumBits - 1) + pNum into pNum
+   if pNum < 2 ^ pNumBits then 
+      put baseconvert(pNum,10,2) into tBits
+   else
+      repeat while pNum >= 1
+         if pNum mod 2 = 0 then
+            put 0 before tBits
+         else
+            put 1 before tBits
+            subtract 1 from pNum
+         end if
+         put (pNum / 2) into pNum
+      end repeat
+   end if
    
-  put "%0" & pNumBits & "s" into fStr
-  put format(fStr,tBits) into tBits
+   put "%0" & pNumBits & "s" into fStr
+   put format(fStr,tBits) into tBits
    
-  return tBits
+   return tBits
 end decToBits
 
 ----
 
 function decToHex pDec, pNumDigits
-  if pDec < 2 ^ 32 then
-    put baseconvert(pDec,10,16) into tHex
-  else
-    repeat while pDec >= 1
-      put pDec mod 16 into tNum
-      put baseconvert(tNum,10,16) before tHex
-      put pDec div 16 into pDec
-    end repeat
-  end if
-  
-  if pNumDigits is not empty and pNumDigits > length(tHex) then
-    repeat pNumDigits - length(tHex)
-      put 0 before thex
-    end repeat
-  end if
-  
-  return tolower(tHex)
+   if pDec < 2 ^ 32 then
+      put baseconvert(pDec,10,16) into tHex
+   else
+      repeat while pDec >= 1
+         put pDec mod 16 into tNum
+         put baseconvert(tNum,10,16) before tHex
+         put pDec div 16 into pDec
+      end repeat
+   end if
+   
+   if pNumDigits is not empty and pNumDigits > length(tHex) then
+      repeat pNumDigits - length(tHex)
+         put 0 before thex
+      end repeat
+   end if
+   
+   return tolower(tHex)
 end decToHex
 
 ----
@@ -1325,10 +1333,10 @@ end hexToBin
 -----
 
 function bitsToHex pBits
-  repeat with n = 1 to length(pBits)-4 step 4
-    put baseconvert(char n to n + 3 of pBits,2,16) after tHexString
-  end repeat
-  return tolower(tHexString)
+   repeat with n = 1 to length(pBits)-4 step 4
+      put baseconvert(char n to n + 3 of pBits,2,16) after tHexString
+   end repeat
+   return tolower(tHexString)
 end bitsToHex
 
 -----
@@ -1356,35 +1364,35 @@ end hexToBits
 --> integers
 
 function getUIntListBE pData, pSize, pDelim
-  if pDelim is empty then put comma into pDelim
-  repeat with n = 1 to length(pData) - (pSize - 1) step pSize
-    put getUIntBE(char n to n + (pSize - 1) of pData) & pDelim after numList
-  end repeat
-  return char 1 to -2 of numList
+   if pDelim is empty then put comma into pDelim
+   repeat with n = 1 to length(pData) - (pSize - 1) step pSize
+      put getUIntBE(char n to n + (pSize - 1) of pData) & pDelim after numList
+   end repeat
+   return char 1 to -2 of numList
 end getUIntListBE
 
 function getIntListBE pData, pSize, pDelim
-  if pDelim is empty then put comma into pDelim
-  repeat with n = 1 to length(pData) - (pSize - 1) step pSize
-    put getIntBE(char n to n + (pSize - 1) of pData) & pDelim after numList
-  end repeat
-  return char 1 to -2 of numList
+   if pDelim is empty then put comma into pDelim
+   repeat with n = 1 to length(pData) - (pSize - 1) step pSize
+      put getIntBE(char n to n + (pSize - 1) of pData) & pDelim after numList
+   end repeat
+   return char 1 to -2 of numList
 end getIntListBE
 
 function getUIntListLE pData, pSize, pDelim
-  if pDelim is empty then put comma into pDelim
-  repeat with n = 1 to length(pData) - (pSize - 1) step pSize
-    put getUIntLE(char n to n + (pSize - 1) of pData) & pDelim after numList
-  end repeat
-  return char 1 to -2 of numList
+   if pDelim is empty then put comma into pDelim
+   repeat with n = 1 to length(pData) - (pSize - 1) step pSize
+      put getUIntLE(char n to n + (pSize - 1) of pData) & pDelim after numList
+   end repeat
+   return char 1 to -2 of numList
 end getUIntListLE
 
 function getIntListLE pData, pSize, pDelim
-  if pDelim is empty then put comma into pDelim
-  repeat with n = 1 to length(pData) - (pSize - 1) step pSize
-    put getIntLE(char n to n + (pSize - 1) of pData) & pDelim after numList
-  end repeat
-  return char 1 to -2 of numList
+   if pDelim is empty then put comma into pDelim
+   repeat with n = 1 to length(pData) - (pSize - 1) step pSize
+      put getIntLE(char n to n + (pSize - 1) of pData) & pDelim after numList
+   end repeat
+   return char 1 to -2 of numList
 end getIntListLE
 
 -----
@@ -1413,32 +1421,32 @@ function getIntBE pBytes
          return getBigInt(pBytes)
          break
    end switch
-    
+   
    return tNum
 end getIntBE
 
 function getUIntBE pBytes
-    local tNum
-    switch length(pBytes)
-        case 1
-            get binarydecode("C", pBytes, tNum)
-            break
-        case 2
-            if not sBigEndian then put reverseBytes(pBytes) into pBytes
-            get binarydecode("S", pBytes, tNum)
-            break
-        case 3
-            put null before pBytes -- falls through to 4
-        case 4
-            if not sBigEndian then put reverseBytes(pBytes) into pBytes
-            get binarydecode("I", pBytes, tNum)
-            break
-        default
-            return getBigUint(pBytes)
-            break
-    end switch
-     
-    return tNum
+   local tNum
+   switch length(pBytes)
+      case 1
+         get binarydecode("C", pBytes, tNum)
+         break
+      case 2
+         if not sBigEndian then put reverseBytes(pBytes) into pBytes
+         get binarydecode("S", pBytes, tNum)
+         break
+      case 3
+         put null before pBytes -- falls through to 4
+      case 4
+         if not sBigEndian then put reverseBytes(pBytes) into pBytes
+         get binarydecode("I", pBytes, tNum)
+         break
+      default
+         return getBigUint(pBytes)
+         break
+   end switch
+   
+   return tNum
 end getUIntBE
 
 
@@ -1467,47 +1475,47 @@ function getIntLE pBytes
          return getBigInt(reverseBytes(pBytes))
          break
    end switch
-    
+   
    return tNum
 end getIntLE
 
 function getUIntLE pBytes
-    local tNum
-    switch length(pBytes)
-        case 1
-            get binarydecode("C", pBytes, tNum)
-            break
-        case 2
-            if  sBigEndian then put reverseBytes(pBytes) into pBytes
-            get binarydecode("S", pBytes, tNum)
-            break
-        case 3
-            put null after pBytes -- falls through to 4
-        case 4
-            if  sBigEndian then put reverseBytes(pBytes) into pBytes
-            get binarydecode("I", pBytes, tNum)
-            break
-        default
-            return getBigUint(reverseBytes(pBytes))
-            break
-    end switch
-     
-    return tNum
+   local tNum
+   switch length(pBytes)
+      case 1
+         get binarydecode("C", pBytes, tNum)
+         break
+      case 2
+         if  sBigEndian then put reverseBytes(pBytes) into pBytes
+         get binarydecode("S", pBytes, tNum)
+         break
+      case 3
+         put null after pBytes -- falls through to 4
+      case 4
+         if  sBigEndian then put reverseBytes(pBytes) into pBytes
+         get binarydecode("I", pBytes, tNum)
+         break
+      default
+         return getBigUint(reverseBytes(pBytes))
+         break
+   end switch
+   
+   return tNum
 end getUIntLE
 
 ----
 
 function getBigUint pBytes
-    local tBits
-    get binarydecode("B*", pBytes, tBits)
-    
-    put length(tBits) into tPow
-    repeat for each char c in tBits
-        subtract 1 from tPow
-        add c * (2 ^ tPow) to tot
-    end repeat
-    
-    return tot
+   local tBits
+   get binarydecode("B*", pBytes, tBits)
+   
+   put length(tBits) into tPow
+   repeat for each char c in tBits
+      subtract 1 from tPow
+      add c * (2 ^ tPow) to tot
+   end repeat
+   
+   return tot
 end getBigUint
 
 function getBigInt pBytes
@@ -1527,131 +1535,131 @@ end getBigInt
 -----------------------------------------------------------------------
 
 function toUInt1 pNum
-  return binaryencode("C", pNum)
+   return binaryencode("C", pNum)
 end toUInt1
 
 function toInt1 pNum
-  return binaryencode("c", pNum)
+   return binaryencode("c", pNum)
 end toInt1
 
 -----
 
 function toUint2LE pNum
-  put binaryencode(S, pNum) into binNum
-  if sBigEndian then
-    return reverseBytes(binNum)
-  else
-    return binNum
-  end if
+   put binaryencode(S, pNum) into binNum
+   if sBigEndian then
+      return reverseBytes(binNum)
+   else
+      return binNum
+   end if
 end toUint2LE
 
 function toInt2LE pNum
-  put binaryencode(s, pNum) into binNum
-  if sBigEndian then
-    return reverseBytes(binNum)
-  else
-    return binNum
-  end if
+   put binaryencode(s, pNum) into binNum
+   if sBigEndian then
+      return reverseBytes(binNum)
+   else
+      return binNum
+   end if
 end toInt2LE
 
 -----
 
 function toUint3LE pNum
-  put binaryencode(I, pNum * 256) into binNum
-  if sBigEndian then
-    return reverseBytes(char 1 to 3 of binNum)
-  else
-    return char 2 to 4 of binNum
-  end if
+   put binaryencode(I, pNum * 256) into binNum
+   if sBigEndian then
+      return reverseBytes(char 1 to 3 of binNum)
+   else
+      return char 2 to 4 of binNum
+   end if
 end toUint3LE
 
 function toInt3LE pNum
-  put binaryencode(i, pNum * 256) into binNum
-  if sBigEndian then
-    return reverseBytes(char 1 to 3 of binNum)
-  else
-    return char 2 to 4 of binNum
-  end if
+   put binaryencode(i, pNum * 256) into binNum
+   if sBigEndian then
+      return reverseBytes(char 1 to 3 of binNum)
+   else
+      return char 2 to 4 of binNum
+   end if
 end toInt3LE
 
 -----
 
 function toUint4LE pNum
-  put binaryencode("I", pNum) into binNum
-  if sBigEndian then
-    return reverseBytes(binNum)
-  else
-    return binNum
-  end if
+   put binaryencode("I", pNum) into binNum
+   if sBigEndian then
+      return reverseBytes(binNum)
+   else
+      return binNum
+   end if
 end toUint4LE
 
 function toInt4LE pNum
-  put binaryencode("i", pNum) into binNum
-  if sBigEndian then
-    return reverseBytes(binNum)
-  else
-    return binNum
-  end if
+   put binaryencode("i", pNum) into binNum
+   if sBigEndian then
+      return reverseBytes(binNum)
+   else
+      return binNum
+   end if
 end toInt4LE
 
 -----
 
 function toUInt2BE pNum
-  put binaryencode(S, pNum) into binNum
-  if not sBigEndian then
-    return reverseBytes(binNum)
-  else
-    return binNum
-  end if
+   put binaryencode(S, pNum) into binNum
+   if not sBigEndian then
+      return reverseBytes(binNum)
+   else
+      return binNum
+   end if
 end toUInt2BE
 
 function toInt2BE pNum
-  put binaryencode(s, pNum) into binNum
-  if not sBigEndian then
-    return reverseBytes(binNum)
-  else
-    return binNum
-  end if
+   put binaryencode(s, pNum) into binNum
+   if not sBigEndian then
+      return reverseBytes(binNum)
+   else
+      return binNum
+   end if
 end toInt2BE
 
 -----
 
 function toUint3BE pNum
-  put binaryencode(I, pNum * 256) into binNum
-  if not sBigEndian then
-    return reverseBytes(char 2 to 4 of binNum)
-  else
-    return char 1 to 3 of binNum
-  end if
+   put binaryencode(I, pNum * 256) into binNum
+   if not sBigEndian then
+      return reverseBytes(char 2 to 4 of binNum)
+   else
+      return char 1 to 3 of binNum
+   end if
 end toUint3BE
 
 function toInt3BE pNum
-  put binaryencode(i, pNum * 256) into binNum
-  if not sBigEndian then
-    return reverseBytes(char 2 to 4 of binNum)
-  else
-    return char 1 to 3 of binNum
-  end if
+   put binaryencode(i, pNum * 256) into binNum
+   if not sBigEndian then
+      return reverseBytes(char 2 to 4 of binNum)
+   else
+      return char 1 to 3 of binNum
+   end if
 end toInt3BE
 
 -----
 
 function toUInt4BE pNum
-  put binaryencode(I, pNum) into binNum
-  if not sBigEndian then
-    return reverseBytes(binNum)
-  else
-    return binNum
-  end if
+   put binaryencode(I, pNum) into binNum
+   if not sBigEndian then
+      return reverseBytes(binNum)
+   else
+      return binNum
+   end if
 end toUInt4BE
 
 function toInt4BE pNum
-  put binaryencode(i, pNum) into binNum
-  if not sBigEndian then
-    return reverseBytes(binNum)
-  else
-    return binNum
-  end if
+   put binaryencode(i, pNum) into binNum
+   if not sBigEndian then
+      return reverseBytes(binNum)
+   else
+      return binNum
+   end if
 end toInt4BE
 
 ----
@@ -1707,119 +1715,119 @@ end toBigIntLE
 --> floats
 
 function getFloatListLE pData, pSize, pDelim
-  if pDelim is empty then put comma into pDelim
-  repeat with n = 1 to length(pData) - (pSize - 1) step pSize
-    put getFloatLE(char n to n + (pSize - 1) of pData) & pDelim after numList
-  end repeat
-  return char 1 to -2 of numList
+   if pDelim is empty then put comma into pDelim
+   repeat with n = 1 to length(pData) - (pSize - 1) step pSize
+      put getFloatLE(char n to n + (pSize - 1) of pData) & pDelim after numList
+   end repeat
+   return char 1 to -2 of numList
 end getFloatListLE
 
 function getFloatListBE pData, pSize, pDelim
-  if pDelim is empty then put comma into pDelim
-  repeat with n = 1 to length(pData) - (pSize - 1) step pSize
-    put getFloatBE(char n to n + (pSize - 1) of pData) & pDelim after numList
-  end repeat
-  return char 1 to -2 of numList
+   if pDelim is empty then put comma into pDelim
+   repeat with n = 1 to length(pData) - (pSize - 1) step pSize
+      put getFloatBE(char n to n + (pSize - 1) of pData) & pDelim after numList
+   end repeat
+   return char 1 to -2 of numList
 end getFloatListBE
 
 -----
 
 function getFloatLE pBytes
-  local tNum
-  if sBigEndian then put reverseBytes(pBytes) into pBytes
-  
-  switch length(pBytes)
-    case 4
-      put "f" into bdc
-      break
-    case 8
-      put "d" into bdc
-      break
-    case 10
-      put "d" into bdc
-      put ieeeExtendedToDouble(pBytes) into pBytes
-      if sBigEndian then put reverseBytes(pBytes) into pBytes
-      break
-    default
-      return empty
-      break
-  end switch
-  
-  get binarydecode(bdc, pBytes, tNum)
-  return tNum
+   local tNum
+   if sBigEndian then put reverseBytes(pBytes) into pBytes
+   
+   switch length(pBytes)
+      case 4
+         put "f" into bdc
+         break
+      case 8
+         put "d" into bdc
+         break
+      case 10
+         put "d" into bdc
+         put ieeeExtendedToDouble(pBytes) into pBytes
+         if sBigEndian then put reverseBytes(pBytes) into pBytes
+         break
+      default
+         return empty
+         break
+   end switch
+   
+   get binarydecode(bdc, pBytes, tNum)
+   return tNum
 end getFloatLE
 
 -----
 
 function getFloatBE pBytes
-  local tNum
-  if not sBigEndian then put reverseBytes(pBytes) into pBytes
-  
-  switch length(pBytes)
-    case 4
-      put "f" into bdc
-      break
-    case 8
-      put "d" into bdc
-      break
-    case 10
-      put "d" into bdc
-      if not sBigEndian then put reverseBytes(pBytes) into pBytes
-      put ieeeExtendedToDouble(pBytes) into pBytes
-      if not sBigEndian then put reverseBytes(pBytes) into pBytes
-      break
-    default
-      return empty
-      break
-  end switch
-  
-  get binarydecode(bdc, pBytes, tNum)
-  return tNum
+   local tNum
+   if not sBigEndian then put reverseBytes(pBytes) into pBytes
+   
+   switch length(pBytes)
+      case 4
+         put "f" into bdc
+         break
+      case 8
+         put "d" into bdc
+         break
+      case 10
+         put "d" into bdc
+         if not sBigEndian then put reverseBytes(pBytes) into pBytes
+         put ieeeExtendedToDouble(pBytes) into pBytes
+         if not sBigEndian then put reverseBytes(pBytes) into pBytes
+         break
+      default
+         return empty
+         break
+   end switch
+   
+   get binarydecode(bdc, pBytes, tNum)
+   return tNum
 end getFloatBE
 
 -----
 
 function toFloat4LE pNum
-  put binaryencode("f", pNum) into tFloat
-  if sBigEndian then return reverseBytes(tFloat)
-  return tFloat
+   put binaryencode("f", pNum) into tFloat
+   if sBigEndian then return reverseBytes(tFloat)
+   return tFloat
 end toFloat4LE
 
 function toFloat4BE pNum
-  put binaryencode("f", pNum) into tFloat
-  if not sBigEndian then return reverseBytes(tFloat)
-  return tFloat
+   put binaryencode("f", pNum) into tFloat
+   if not sBigEndian then return reverseBytes(tFloat)
+   return tFloat
 end toFloat4BE
 
 -----
 
 function toFloat8LE pNum
-  put binaryencode("d", pNum) into tFloat
-  if sBigEndian then return reverseBytes(tFloat)
-  return tFloat
+   put binaryencode("d", pNum) into tFloat
+   if sBigEndian then return reverseBytes(tFloat)
+   return tFloat
 end toFloat8LE
 
 function toFloat8BE pNum
-  put binaryencode("d", pNum) into tFloat
-  if not sBigEndian then return reverseBytes(tFloat)
-  return tFloat
+   put binaryencode("d", pNum) into tFloat
+   if not sBigEndian then return reverseBytes(tFloat)
+   return tFloat
 end toFloat8BE
 
 -----
 
 function toFloat10LE pNum
-  put binaryencode("d", pNum) into tDouble
-  if sBigEndian then put reverseBytes(tDouble) into tDouble
-  put ieeeDoubleToExtended(tDouble) into tExtended
-  if sBigEndian then return reverseBytes(tExtended)
-  return tExtended
+   put binaryencode("d", pNum) into tDouble
+   if sBigEndian then put reverseBytes(tDouble) into tDouble
+   put ieeeDoubleToExtended(tDouble) into tExtended
+   if sBigEndian then return reverseBytes(tExtended)
+   return tExtended
 end toFloat10LE
 
 function toFloat10BE pNum
-  put binaryencode("d", pNum) into tDouble
-  if not sBigEndian then put reverseBytes(tDouble) into tDouble
-  put ieeeDoubleToExtended(tDouble) into tExtended
-  return tExtended
+   put binaryencode("d", pNum) into tDouble
+   if not sBigEndian then put reverseBytes(tDouble) into tDouble
+   put ieeeDoubleToExtended(tDouble) into tExtended
+   return tExtended
 end toFloat10BE
 
 -----------------------------------------------------------------------------------------
@@ -1832,66 +1840,66 @@ end toFloat10BE
 -- Take a sequence of 10-bytes encoding an extended number, and return
 -- a sequence of 8-bytes encoding a double number
 function ieeeExtendedToDouble pExtended
-  local tExtendedSign, tExtendedExponent, tExtendedMantissa, tExtendedBits
-  local tDoubleExponent, tDoubleMantissa, tDoubleBits
-
-  if the length of pExtended is not 10 then
-    throw "ieeeerr,Extended number must be 10 bytes long"
-  end if
-
-  -- Step 1: Split the extended number up
-  get binarydecode("B80", pExtended, tExtendedBits)
-  put char 1 of tExtendedBits into tExtendedSign
-  put char 2 to 16 of tExtendedBits into tExtendedExponent
-  put char 17 to 80 of tExtendedBits into tExtendedMantissa
-
-  -- Step 2: Truncate the fields
-
-  -- The exponent is the trickiest because it is stored as a number relative to
-  -- the smallest possible exponent which in the case of an extended number is
-  -- -16383.
-  -- Therefore, we take the following steps:
-  --   . Make sure we have 16-binary digits
-  --   . Encode as two binary bytes
-  --   . Decode as a 2-byte integer, most-significant byte first (network byte-order)
-  --   . Adjust and clamp to the double exponent range
-  local tNumericExponent
-  get binarydecode("n", binaryencode("B16", "0" & tExtendedExponent), tNumericExponent)
-  subtract 16383 from tNumericExponent
-  put max(min(tNumericExponent, 2046), -2046) into tNumericExponent
-
-  -- IEEE Doubles actually have a normalization requirement for representation.
-  -- The Mantissa is taken to be 1.F where F is the binary fraction encoded in the
-  -- number. This seems subtly different from the extended format, which has no
-  -- such requirement (it appears). Therefore, we have to find the leading '1' in the
-  -- extended mantissa and adjust the exponent accordingly.
-  -- Of course, if there is no leading 1, then the number is 0
-  local tLeadingOne
-
-  -- Find the leading one, and return zero if there is none
-  put offset("1", tExtendedMantissa) into tLeadingOne
-  if tLeadingOne is 0 then
-    return 0
-  end if
-
-  -- Extract 52-bits for the mantissa, and pad with zeros if we don't have enough
-  put char tLeadingOne + 1 to tLeadingOne + 1 + 52 of tExtendedMantissa into tDoubleMantissa
-  repeat while the length of tDoubleMantissa < 52
-    put "0" after tDoubleMantissa
-  end repeat
-
-  -- Adjust the exponent
-  subtract tLeadingOne - 1 from tDoubleExponent
-
-  -- Finish encoding the exponent
-  get binarydecode("B16", binaryencode("n", 1023 + tNumericExponent), tDoubleExponent)
-  put char 6 to 16 of tDoubleExponent into tDoubleExponent
-
-  -- Now reconstruct the double as bits
-  put tExtendedSign & tDoubleExponent & tDoubleMantissa into tDoubleBits
-
-  -- And perform the final encoding
-  return binaryencode("B64", tDoubleBits)
+   local tExtendedSign, tExtendedExponent, tExtendedMantissa, tExtendedBits
+   local tDoubleExponent, tDoubleMantissa, tDoubleBits
+   
+   if the length of pExtended is not 10 then
+      throw "ieeeerr,Extended number must be 10 bytes long"
+   end if
+   
+   -- Step 1: Split the extended number up
+   get binarydecode("B80", pExtended, tExtendedBits)
+   put char 1 of tExtendedBits into tExtendedSign
+   put char 2 to 16 of tExtendedBits into tExtendedExponent
+   put char 17 to 80 of tExtendedBits into tExtendedMantissa
+   
+   -- Step 2: Truncate the fields
+   
+   -- The exponent is the trickiest because it is stored as a number relative to
+   -- the smallest possible exponent which in the case of an extended number is
+   -- -16383.
+   -- Therefore, we take the following steps:
+   --   . Make sure we have 16-binary digits
+   --   . Encode as two binary bytes
+   --   . Decode as a 2-byte integer, most-significant byte first (network byte-order)
+   --   . Adjust and clamp to the double exponent range
+   local tNumericExponent
+   get binarydecode("n", binaryencode("B16", "0" & tExtendedExponent), tNumericExponent)
+   subtract 16383 from tNumericExponent
+   put max(min(tNumericExponent, 2046), -2046) into tNumericExponent
+   
+   -- IEEE Doubles actually have a normalization requirement for representation.
+   -- The Mantissa is taken to be 1.F where F is the binary fraction encoded in the
+   -- number. This seems subtly different from the extended format, which has no
+   -- such requirement (it appears). Therefore, we have to find the leading '1' in the
+   -- extended mantissa and adjust the exponent accordingly.
+   -- Of course, if there is no leading 1, then the number is 0
+   local tLeadingOne
+   
+   -- Find the leading one, and return zero if there is none
+   put offset("1", tExtendedMantissa) into tLeadingOne
+   if tLeadingOne is 0 then
+      return 0
+   end if
+   
+   -- Extract 52-bits for the mantissa, and pad with zeros if we don't have enough
+   put char tLeadingOne + 1 to tLeadingOne + 1 + 52 of tExtendedMantissa into tDoubleMantissa
+   repeat while the length of tDoubleMantissa < 52
+      put "0" after tDoubleMantissa
+   end repeat
+   
+   -- Adjust the exponent
+   subtract tLeadingOne - 1 from tDoubleExponent
+   
+   -- Finish encoding the exponent
+   get binarydecode("B16", binaryencode("n", 1023 + tNumericExponent), tDoubleExponent)
+   put char 6 to 16 of tDoubleExponent into tDoubleExponent
+   
+   -- Now reconstruct the double as bits
+   put tExtendedSign & tDoubleExponent & tDoubleMantissa into tDoubleBits
+   
+   -- And perform the final encoding
+   return binaryencode("B64", tDoubleBits)
 end ieeeExtendedToDouble
 
 -- Take a sequence of 8 bytes encoding a double number, and return a

@@ -6,8 +6,8 @@ Script "stack_awsLibs_button_id_1028"
 */
 
 
-------------------------------------------------------------------
-------------------------------------------------------------------
+-----------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
 /*
 libJson 1.0.4b
 Author: mark Smith
@@ -17,11 +17,12 @@ changed:
 1.0.4b
 now handles diacritic chars better - thanks to imed-editions
 1.0.3b
-empty array values are now properly encoded into a json object as empty <""> instead of as literal "null".
+empty array values are now properly encoded into a json object as empty <"">
+instead of as literal "null".
 
 */
-------------------------------------------------------------------
-------------------------------------------------------------------
+-----------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
 
 local sJson
 local sIndex
@@ -54,7 +55,7 @@ function jsonToArray pJson, asUnicode
    end if
    put empty into sJson
    return tArray
-    
+   
 end jsonToArray
 
 -----
@@ -82,7 +83,7 @@ private command tokenizeJson pJson
          add 1 to sNumTokens
          put prevToken & tToken into sJson[sNumTokens]
          put empty into prevToken
-          
+         
          if tToken is in "{[" then add 1 to tDepth
          if tToken is in "}]" then subtract 1 from tDepth
          
@@ -91,7 +92,8 @@ private command tokenizeJson pJson
    
    if tDepth <> 0 then return "libJson-error: json malformed"
    repeat with n = 1 to sNumTokens - 1
-      if (sJson[n] is not in "{}[],:") and (sJson[n + 1] is not in "{}[],:") then return "libJson-error: json malformed"
+      if (sJson[n] is not in "{}[],:") and (sJson[n + 1] is not in "{}[],:") \
+            then return "libJson-error: json malformed"
    end repeat
    
 end tokenizeJson
@@ -100,7 +102,7 @@ end tokenizeJson
 
 private function jObjectToArray
    put empty into tArray
-  
+   
    repeat while sIndex < sNumTokens
       add 1 to sIndex
       
@@ -163,8 +165,8 @@ private function jArrayToArray
    end repeat
 end jArrayToArray
 
-------------------------------------------------------------------
-------------------------------------------------------------------
+-----------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
 --> rev to json
 
 
@@ -191,7 +193,7 @@ private function arrayToJobject pArray
       put q(json.encodeString(k)) & ":" after tJson
       
       if pArray[k] is an array then
-          
+         
          if arrayKeysAreNumeric(pArray[k]) then
             put arrayToJarray(pArray[k]) & comma after tJson
          else
@@ -199,7 +201,7 @@ private function arrayToJobject pArray
          end if
          
       else
-          
+         
          put json.encodeValue(pArray[k]) & comma after tJson
          
       end if
@@ -241,41 +243,41 @@ private function arrayKeysAreNumeric pArray
    return true
 end arrayKeysAreNumeric
 
-------------------------------------------------------------------
-------------------------------------------------------------------
+-----------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
 
-------------------------------------------------------------------
-------------------------------------------------------------------
+-----------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
 --> utilities
 
 -- function json.format pJson, pIndentSize
-   -- if pIndentSize is empty then put 3 into pIndentSize
-   -- repeat pIndentSize
-      -- put space after tIndent
-   -- end repeat
-   -- put 0 into tDepth
-   -- 
-   -- replace ":" with ": " in pJson
-   -- replace comma with comma & cr in pJson
-   -- replace "{" with "{" & cr in pJson
-   -- replace "[" with "[" & cr in pJson
-   -- replace "}" with "}" & cr in pJson
-   -- replace "]" with "]" & cr in pJson
-   -- replace "}" & cr & comma with "}," in pJson
-   -- replace "]" & cr & comma with "]," in pJson
-   -- 
-   -- repeat for each line L in pJson
-      -- repeat tDepth
-         -- put tIndent after nJson
-      -- end repeat
-      -- put L & cr after nJson
-       -- 
-      -- if "{" is in L then add 1 to tDepth
-      -- if "[" is in L then add 1 to tDepth
-      -- if "}" is in L then subtract 1 from tDepth
-      -- if "]" is in L then subtract 1 from tDepth
-   -- end repeat
-   -- return nJson
+-- if pIndentSize is empty then put 3 into pIndentSize
+-- repeat pIndentSize
+-- put space after tIndent
+-- end repeat
+-- put 0 into tDepth
+-- 
+-- replace ":" with ": " in pJson
+-- replace comma with comma & cr in pJson
+-- replace "{" with "{" & cr in pJson
+-- replace "[" with "[" & cr in pJson
+-- replace "}" with "}" & cr in pJson
+-- replace "]" with "]" & cr in pJson
+-- replace "}" & cr & comma with "}," in pJson
+-- replace "]" & cr & comma with "]," in pJson
+-- 
+-- repeat for each line L in pJson
+-- repeat tDepth
+-- put tIndent after nJson
+-- end repeat
+-- put L & cr after nJson
+-- 
+-- if "{" is in L then add 1 to tDepth
+-- if "[" is in L then add 1 to tDepth
+-- if "}" is in L then subtract 1 from tDepth
+-- if "]" is in L then subtract 1 from tDepth
+-- end repeat
+-- return nJson
 -- end json.format
 
 function json.format pJson, pIndentSize
@@ -379,24 +381,26 @@ private function unicodeEscapes pString
       if count < 2 then next repeat
       
       if buffer is "\u" then put true into inEscape
-       
+      
       if inEscape then 
          if length(buffer) < 6 then 
             next repeat 
          else 
             -- TO DEAL WITH DIACRITICS : 
             if platform() is "MacOS" then 
-               put isotomac(numtochar(baseconvert(char 3 to 6 of buffer, 16, 10))) into buffer 
+               put isotomac(numtochar(baseconvert(char 3 to 6 of buffer, 16, \
+                     10))) into buffer 
             else 
-               put numtochar(baseconvert(char 3 to 6 of buffer, 16, 10)) into buffer 
+               put numtochar(baseconvert(char 3 to 6 of buffer, 16, 10)) \
+                     into buffer
             end if 
-            put false into inEscape 
+            put false into inEscape
          end if 
       else 
-         put char 1 of buffer after nString 
+         put char 1 of buffer after nString
          delete char 1 of buffer 
       end if 
-       
+      
    end repeat
    put buffer after nString
    return nString
@@ -437,7 +441,8 @@ private function json.encodeString pString
    replace numtochar(12) with "\f" in pString
    replace numtochar(13) with "\r" in pString
    
-   repeat for each item i in "0,1,2,3,4,5,6,7,11,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31"
+   repeat for each item i in "0,1,2,3,4,5,6,7,11,14,15,16,17,18,19,20," & \
+         "21,22,23,24,25,26,27,28,29,30,31"
       replace numtochar(i) with "\u" & format("%04X", i) in pString
    end repeat
    

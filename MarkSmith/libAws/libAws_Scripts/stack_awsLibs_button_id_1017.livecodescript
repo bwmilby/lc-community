@@ -74,13 +74,13 @@ function trim pStr
 end trim
 
 function q aString
-  return quote & aString & quote
+   return quote & aString & quote
 end q
 
 -----
 
 function sq pStr
-    return "'" & pStr & "'"
+   return "'" & pStr & "'"
 end sq
 
 function bq pStr
@@ -204,19 +204,19 @@ function xmlHeader pEncoding
    end if
 end xmlHeader
 
---------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 -- takes a comma delimited list of messages and cancels them
---------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 
 on cancelMessages mNames
-  repeat for each line L in the pendingmessages
-    if item 3 of L is among the items of mNames then cancel item 1 of L
-  end repeat
+   repeat for each line L in the pendingmessages
+      if item 3 of L is among the items of mNames then cancel item 1 of L
+   end repeat
 end cancelMessages
 
-----------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 -- panic! attempts to stop all open processes
------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 
 on killAllProcs
    repeat for each line L in the openprocesses
@@ -228,7 +228,7 @@ function uid pStr
    if the platform is not "Win32" then
       put shell("uuidgen") into tUuid
    else
-       
+      
    end if
    return md5.hex(tUUid & the millisecs & pStr)
 end uid
@@ -253,8 +253,8 @@ function levenshtein pStr1, pStr2
          else
             put 1 into cost
          end if
-          
-          put min(d[i-1][j] + 1, d[i][j-1] + 1, d[i-1][j-1] + cost) into d[i][j]
+         
+         put min(d[i-1][j] + 1, d[i][j-1] + 1, d[i-1][j-1] + cost) into d[i][j]
          
       end repeat
    end repeat
@@ -280,10 +280,11 @@ function damLevDistance pStr1, pStr2
          else
             put 1 into cost
          end if
-          
+         
          put min(d[i-1][j] + 1, d[i][j-1] + 1, d[i-1][j-1] + cost) into d[i][j]
-          
-         if (i > 1) and (j > 1) and (char i of pStr1 = char j-1 of pStr2) and (char i-1 of pStr1 = char j of pStr2) then
+         
+         if (i > 1) and (j > 1) and (char i of pStr1 = char j-1 of pStr2) and \
+               (char i-1 of pStr1 = char j of pStr2) then
             put min(d[i][j], d[i-2][j-2] + cost) into d[i][j]
          end if
          
@@ -292,12 +293,12 @@ function damLevDistance pStr1, pStr2
    return d[m][n]
 end damLevDistance
 
----===---===---===---===---===---===---===---===---===---===---===---===---===---===---===---
+---===---===---===---===---===---===---===---===---===---===---===---===---===---
 --> arrays etc.
 
--------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 -- rough and ready way of displaying the contents of an array
---------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 function showArray pArray
    if pArray is not an array then return pArray
    repeat for each line L in keys(pArray)
@@ -310,9 +311,9 @@ function showArray pArray
    return tList
 end showArray
 
------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 -- rough and ready xml formatting - not needed
------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 
 function mformatXml pXml, pIndent
    put revCreateXmlTree(pXml, false, true, false) into tTree
@@ -324,21 +325,21 @@ function mformatXml pXml, pIndent
    
    repeat for each line L in tFtext
       put word 1 to -1 of L into tLine
-         get offset("<", L)
-         if it > 2 then
-            repeat it div 2
-               put pIndent before tLine
-            end repeat
-         end if
+      get offset("<", L)
+      if it > 2 then
+         repeat it div 2
+            put pIndent before tLine
+         end repeat
+      end if
       put tLine & cr after tFormatted
    end repeat
-    
+   
    return tFormatted
 end mformatXml
 
-----------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 -- returns an md5 of any data including multi-dimensional arrays
------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 
 function dataDigest pData
    if pData is an array then put flattenArray(pData) into pData
@@ -359,9 +360,9 @@ function flattenArray pArray
    return tStr
 end flattenArray
 
--------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 -- returns true if two arrays are identical, otherwise false
--------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 
 function arraysMatch a1, a2
    put keys(a1) into k1 ; put keys(a2) into k2
@@ -380,10 +381,10 @@ function arraysMatch a1, a2
    return tArraysMatch
 end arraysMatch
 
----------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 -- takes any data including arrays, and returns a base 64 string
 -- which can be turned back into the original input by "unrpak"
-----------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 -- rpak
 
 function rpak pData
@@ -464,14 +465,14 @@ function unrpakcrypt pData, pPassphrase, pCipher
 end unrpakcrypt
 
 
----===---===---===---===---===---===---===---===---===---===---===---===---===---===---===---
----===---===---===---===---===---===---===---===---===---===---===---===---===---===---===---
+---===---===---===---===---===---===---===---===---===---===---===---===---===---
+---===---===---===---===---===---===---===---===---===---===---===---===---===---
 --> dates
 
-------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 -- turns short system date into date format yyyymmdd.
 -- if no date is given todays date is used.
-------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 
 function numericDate pDate
    if pDate is empty then
@@ -480,17 +481,19 @@ function numericDate pDate
       put pDate into tDate
    end if
    convert tDate from short system date to dateItems
-   return format("%04d%02d%02d", item 1 of tDate, item 2 of tDate, item 3 of tDate)
+   return format("%04d%02d%02d", item 1 of tDate, item 2 of tDate, \
+         item 3 of tDate)
 end numericDate
 
 -----
 
 function numericDateTime
-  put the seconds into tSecs
-  convert tSecs from seconds to dateItems
-  put format("%04d%02d%02d%02d%02d", item 1 of tSecs, item 2 of tSecs, item 3 of tSecs, item 4 of tSecs, item 5 of tSecs) into tDateTime
-  put "." after char 8 of tDateTime
-  return tDateTime
+   put the seconds into tSecs
+   convert tSecs from seconds to dateItems
+   put format("%04d%02d%02d%02d%02d", item 1 of tSecs, item 2 of tSecs, \
+         item 3 of tSecs, item 4 of tSecs, item 5 of tSecs) into tDateTime
+   put "." after char 8 of tDateTime
+   return tDateTime
 end numericDateTime
 
 -----
@@ -581,13 +584,14 @@ end theDays
 
 function date.julian d,m,y
    if paramcount() = 0 then
-       set the itemdelimiter to "/"
-       put the date into td
-       put item 1 of td into m
-       put item 2 of td into d
-       put "20" & item 3 of td into y
+      set the itemdelimiter to "/"
+      put the date into td
+      put item 1 of td into m
+      put item 2 of td into d
+      put "20" & item 3 of td into y
    end if
-   return (1461*(y+4800+(m-14) div 12)) div 4+(367*(m-2-12*((m-14) div 12))) div 12-(3*((y+4900.0+(m-14) div 12) div 100)) div 4+d-32075
+   return (1461*(y+4800+(m-14) div 12)) div 4+(367*(m-2-12*((m-14) div 12))) \
+         div 12-(3*((y+4900.0+(m-14) div 12) div 100)) div 4+d-32075
 end date.julian
 
 
@@ -610,8 +614,8 @@ function date.julian2DayOfWeek aJulian
    return line ((aJulian+1) mod 7 + 1) of the weekdaynames
 end date.julian2DayOfWeek
 
----===---===---===---===---===---===---===---===---===---===---===---===---===---===---===---
----===---===---===---===---===---===---===---===---===---===---===---===---===---===---===---
+---===---===---===---===---===---===---===---===---===---===---===---===---===---
+---===---===---===---===---===---===---===---===---===---===---===---===---===---
 --> files
 
 
@@ -670,15 +674,15 @@ end deleteFile
 -----
 
 function getFileName pPath
-  set the itemdelimiter to "/"
-  return item -1 of pPath
+   set the itemdelimiter to "/"
+   return item -1 of pPath
 end getFileName
 
 -----
 
 function getFolder pPath
-  set the itemdelimiter to "/"
-  return item 1 to -2 of pPath & "/"
+   set the itemdelimiter to "/"
+   return item 1 to -2 of pPath & "/"
 end getFolder
 
 -----
@@ -692,12 +696,12 @@ end getExtension
 -----
 
 function getAllFiles pFolder
-    put shell("find " & q(pFolder) & " -type f")  into fileList
-    filter fileList without empty
-    filter fileList without "*/.*"
-    --filter fileList without "*/¬*"
-    sort lines of fileList
-    return fileList
+   put shell("find " & q(pFolder) & " -type f")  into fileList
+   filter fileList without empty
+   filter fileList without "*/.*"
+   --filter fileList without "*/¬*"
+   sort lines of fileList
+   return fileList
 end getAllFiles
 
 -----
@@ -760,7 +764,8 @@ function folderWalk pFolder, pType
    
    if pType is not "d" then
       repeat for each line L in the files
-         if L is not empty and char 1 of L is not "." then put pFolder & "/" & L & cr after tFiles
+         if L is not empty and char 1 of L is not "." then \
+               put pFolder & "/" & L & cr after tFiles
       end repeat
    end if
    
@@ -778,7 +783,7 @@ end folderWalk
 -----
 
 function getAllFolders pFolder
-  return shell("find " & q(pFolder) & " -type d")
+   return shell("find " & q(pFolder) & " -type d")
 end getAllFolders
 
 
@@ -790,10 +795,10 @@ function getBigFileInfo pFile, pIncludeMd5
    put the directory into tOldFolder
    set the directory to tFolderName
    put urldecode(the detailed files) into tFileList
-    
+   
    filter tFileList with tFileName & ",*"
    put line 1 of tFileList into tInfo
-    
+   
    put pFile into tFileInfo["fullPathName"]
    put item 1 of tInfo into tFileInfo["fileName"]
    put tFolderName into tFileInfo["location"]
@@ -813,7 +818,7 @@ function getBigFileInfo pFile, pIncludeMd5
       put tMd5s["b64"] into tFileInfo["md5.b64"]
       put tMd5s["hex"] into tFileInfo["md5.hex"]
    end if
-    
+   
    set the directory to tOldFolder
    return tFileInfo
 end getBigFileInfo
@@ -857,8 +862,9 @@ function readDetailedFileLine pLine
    put urldecode(item 1 of pLine) into tArray["name"]
    
    put 1 into tCount
-   repeat for each item i in "size,ressize,created,modified,accessed,backedup,owner,group,perms,type"
-   add 1 to tCount
+   repeat for each item i in \
+         "size,ressize,created,modified,accessed,backedup,owner,group,perms,type"
+      add 1 to tCount
       put item tCount of pLine into tArray[i]
    end repeat
    return tArray
@@ -937,55 +943,55 @@ end doCCfile
 --> numbers
 
 function nzp
-  repeat with n = 1 to paramcount()
-    if (not isnumber(param(n))) or (param(n) <= 0) then return false
-  end repeat
-  return true
+   repeat with n = 1 to paramcount()
+      if (not isnumber(param(n))) or (param(n) <= 0) then return false
+   end repeat
+   return true
 end nzp
 
 -----
 
 function nzn
-  repeat with n = 1 to paramcount()
-    if (not isnumber(param(n))) or (param(n) >= 0) then return false
-  end repeat
-  return true
+   repeat with n = 1 to paramcount()
+      if (not isnumber(param(n))) or (param(n) >= 0) then return false
+   end repeat
+   return true
 end nzn
 
 -----
 
 function nza
-  repeat with n = 1 to paramcount()
-    if (not isnumber(param(n))) or (param(n) = 0) then return false
-  end repeat
-  return true
+   repeat with n = 1 to paramcount()
+      if (not isnumber(param(n))) or (param(n) = 0) then return false
+   end repeat
+   return true
 end nza
 
 -----
 
 function nzpi
-  repeat with n = 1 to paramcount()
-    if (not (param(n) is an integer)) or (param(n) <= 0) then return false
-  end repeat
-  return true
+   repeat with n = 1 to paramcount()
+      if (not (param(n) is an integer)) or (param(n) <= 0) then return false
+   end repeat
+   return true
 end nzpi
 
 -----
 
 function nzni
    repeat with n = 1 to paramcount()
-    if (not (param(n) is an integer)) or (param(n) >= 0) then return false
-  end repeat
-  return true
+      if (not (param(n) is an integer)) or (param(n) >= 0) then return false
+   end repeat
+   return true
 end nzni
 
 -----
 
 function nzi
-  repeat with n = 1 to paramcount()
-    if (not (param(n) is an integer)) or (param(n) = 0) then return false
-  end repeat
-  return true
+   repeat with n = 1 to paramcount()
+      if (not (param(n) is an integer)) or (param(n) = 0) then return false
+   end repeat
+   return true
 end nzi
 
 -----
@@ -1032,7 +1038,7 @@ function ordinate pNum
    return pNum & tSuffix
 end ordinate
 
----===---===---===---===---===---===---===---===---===---===---===---===---===---===---===---
+---===---===---===---===---===---===---===---===---===---===---===---===---===---
 --> email
 
 command mail pTo, pSub, pMsg, pFrom, pCc, pBcc, pAttachment, pAttachment2
@@ -1045,17 +1051,19 @@ command mail pTo, pSub, pMsg, pFrom, pCc, pBcc, pAttachment, pAttachment2
    put shellEscape(pAttachment) into pAttachment
    put shellEscape(pAttachment2) into pAttachment2
    
-   get shell("(uuencode" && q(pAttachment) && q(pAttachment2) & ";echo -e" && q(pMsg) & ")" \
-   && "| mail -s" && q(pSub) && q(pTo) && "-c" && q(pCc)  && "-b" && q(pBcc) && "-- -f" && q(pFrom))
+   get shell("(uuencode" && q(pAttachment) && q(pAttachment2) & ";echo -e" && \
+         q(pMsg) & ")" && "| mail -s" && q(pSub) && q(pTo) && "-c" && q(pCc) \
+         && "-b" && q(pBcc) && "-- -f" && q(pFrom))
 end mail
 
 -----
 
 function emailValid pEmail
-   return matchtext(pEmail,"^[A-z0-9_\-\.]+[@][A-z0-9_\-]+([.][A-z0-9_\-]+)+[A-z]$")
+   return matchtext(pEmail,\
+         "^[A-z0-9_\-\.]+[@][A-z0-9_\-]+([.][A-z0-9_\-]+)+[A-z]$")
 end emailValid
 
----===---===---===---===---===---===---===---===---===---===---===---===---===---===---===---
+---===---===---===---===---===---===---===---===---===---===---===---===---===---
 --> common paths
 
 -----
@@ -1072,7 +1080,7 @@ end tempDir
 function curlPath
    switch the platform
       case "Win32"
-          
+         
          break
       default
          return "curl"
@@ -1085,7 +1093,7 @@ end curlPath
 function sslPath
    switch the platform
       case "Win32"
-          
+         
          break
       default
          return "openssl"
@@ -1094,5 +1102,4 @@ function sslPath
 end sslPath
 
 
----===---===---===---===---===---===---===---===---===---===---===---===---===---===---===---
-
+---===---===---===---===---===---===---===---===---===---===---===---===---===---
