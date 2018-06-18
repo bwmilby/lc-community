@@ -68,3 +68,8 @@ on makeStr pNum
       put numtobyte(random(255)) after sStr
    end repeat
 end makeStr
+
+private function q pStr
+   return quote & pStr & quote
+end q
+
