@@ -7,6 +7,8 @@ Script "stack_RemoteDbEncryption_button_id_1020"
 
 
 on mouseup
+   local tURL
+   
    put "https://en.wikipedia.org/wiki/Advanced_Encryption_Standard" into tURL
    launch url tURL
 end mouseup
