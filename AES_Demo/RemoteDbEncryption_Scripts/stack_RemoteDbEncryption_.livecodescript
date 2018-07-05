@@ -10,12 +10,17 @@ Script "stack_RemoteDbEncryption_"
 --These contain the secret information that you don't want
 --users or hackers to find.
 
+--This stack was authored by:
+--William A. Prothero
+--prothero@ucsb.edu
+--https://earthlearningresources.org
+--with inspiration and help from:
+--Brian Milby and Andre Garza
+
 local theRandomSeed
 
 function randomChrs n
-   if theRandomSeed = "" then
-      setRandomSeed
-   end if
+   setRandomSeed
    put "" into tChars
    repeat with i=1 to n
       put random(256) into nChar
@@ -26,15 +31,11 @@ end randomChrs
 
 on setRandomSeed
    put (the milliseconds) into tMS
-   put trunc(tMs/10000000) into tDiv
-   put tMS mod tDiv into theRandomSeed
+   put tMS mod 1000000 into theRandomSeed
    set the randomseed to theRandomSeed
 end setRandomSeed
 
 function theRandomIV
-   if theRandomSeed = "" then
-      setRandomSeed
-   end if
    put randomChrs(16) into tIVBytes
    return tIVBytes
 end theRandomIV
@@ -66,6 +67,7 @@ function theDecoded tData
    put byte 25 to n of tData into tRetB64Data
    put base64decode(tRetB64Data) into tRetData
    put "AES-256-CTR" into tCipher
+   --the next line must math the emcryption string in the php script
    put "AFBDDFCFBDBBDDCCFFACGHDFFFFEEDCC" into tEncryptionKey
    decrypt tRetData using tCipher with key tEncryptionKey and iV tIV
    put it into tReturn

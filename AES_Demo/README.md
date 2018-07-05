@@ -7,15 +7,17 @@ Principal work by:
 * William A. Prothero
 * prothero@ucsb.edu
 * https://earthlearningsolutions.org
-* Informed and inspired by:
-* Brian Milby and Andre Garza
+
+Informed and inspired by:
+* Andre Garza
+* Brian Milby
 
 
 Here are the 2 discussion threads on the use list:
-- [Individual Messages](http://lists.runrev.com/pipermail/use-livecode/2018-July/248184.html)
- / [Threaded View](http://runtime-revolution.278305.n4.nabble.com/Script-Only-Stack-Behaviors-and-Nesting-tp4725764p4725870.html)
-- [Individual Messages](http://lists.runrev.com/pipermail/use-livecode/2018-June/247982.html)
- / [Threaded View](http://runtime-revolution.278305.n4.nabble.com/Top-Bottom-Left-Right-tp4725667p4725671.html)
+- [Individual Messages]( http://lists.runrev.com/pipermail/use-livecode/2018-July/248184.html)
+ / [Threaded View]( http://runtime-revolution.278305.n4.nabble.com/Script-Only-Stack-Behaviors-and-Nesting-tp4725764p4725870.html)
+- [Individual Messages]( http://lists.runrev.com/pipermail/use-livecode/2018-June/247982.html)
+ / [Threaded View]( http://runtime-revolution.278305.n4.nabble.com/Top-Bottom-Left-Right-tp4725667p4725671.html)
 
 
 Notes:
